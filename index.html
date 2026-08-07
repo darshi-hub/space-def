@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Solar Liberation Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <canvas id="gameCanvas" aria-label="Solar Liberation Command game field"></canvas>
+
+    <section id="storyScreen" class="screen active">
+      <div class="story-container">
+        <h1 class="pixel-text">SOLAR LIBERATION</h1>
+        <div id="storyText" class="story-text"></div>
+        <button id="skipStoryButton" class="primary-button pixel-button hidden">START MISSION</button>
+      </div>
+    </section>
+
+    <div id="hud" class="hud hidden" aria-live="polite">
+      <div class="hud-top">
+        <div class="mission-card">
+          <span id="hudPlanet">Mercury</span>
+          <strong id="hudObjective">Neutralize shield nodes</strong>
+        </div>
+        <div class="status-bank">
+          <div class="meter hull">
+            <span>Hull</span>
+            <b id="hullText">100%</b>
+            <i id="hullBar"></i>
+          </div>
+          <div class="meter shield">
+            <span>Shield</span>
+            <b id="shieldText">100%</b>
+            <i id="shieldBar"></i>
+          </div>
+          <div class="meter heat">
+            <span>Heat</span>
+            <b id="heatText">0%</b>
+            <i id="heatBar"></i>
+          </div>
+          <div class="meter ammo">
+            <span>Ammo</span>
+            <b id="ammoText">120</b>
+            <i id="ammoBar"></i>
+          </div>
+        </div>
+        <div class="hud-right">
+          <div><span>Salvage</span><strong id="hudSalvage">0</strong></div>
+          <div><span>Time</span><strong id="hudTime">00:00</strong></div>
+          <div><span>Combo</span><strong id="hudCombo">x1.0</strong></div>
+        </div>
+      </div>
+      <div id="abilityDock" class="ability-dock">
+        <div class="ability-pill">
+          <span>Dash</span>
+          <strong id="dashReady">Ready</strong>
+          <i id="dashCooldown"></i>
+        </div>
+        <div class="ability-pill">
+          <span>Pulse</span>
+          <strong id="pulseReady">Ready</strong>
+          <i id="pulseCooldown"></i>
+        </div>
+        <div class="ability-pill">
+          <span>Missile</span>
+          <strong id="missileReady">Ready</strong>
+          <i id="missileCooldown"></i>
+        </div>
+        <div class="ability-pill">
+          <span>Drone</span>
+          <strong id="droneReady">Ready</strong>
+          <i id="droneCooldown"></i>
+        </div>
+        <div class="ability-pill">
+          <span>Speed</span>
+          <strong id="speedText">0</strong>
+          <i id="speedBar"></i>
+        </div>
+      </div>
+      <canvas id="miniMap" width="180" height="180" aria-hidden="true"></canvas>
+      <div id="warning" class="warning"></div>
+    </div>
+
+    <main id="commandDeck" class="screen hidden">
+      <header class="deck-header">
+        <div>
+          <p class="eyebrow">Helios Fleet / Command Deck</p>
+          <h1><span>Solar Liberation</span> <span>Command</span></h1>
+        </div>
+        <div class="deck-actions">
+          <button id="muteButton" class="icon-button" type="button" title="Toggle audio">Audio</button>
+          <button id="resetButton" class="ghost-button" type="button">Reset</button>
+        </div>
+      </header>
+
+      <section class="command-grid">
+        <section class="panel solar-front">
+          <div class="panel-heading">
+            <h2>Solar Front</h2>
+            <span id="frontStatus">0 / 8 liberated</span>
+          </div>
+          <div id="planetList" class="planet-list"></div>
+        </section>
+
+        <section class="panel dossier">
+          <div class="planet-orbit" aria-hidden="true">
+            <div id="planetPreview" class="planet-preview"></div>
+          </div>
+          <p class="eyebrow" id="selectedThreat">Threat 1</p>
+          <h2 id="selectedPlanet">Mercury</h2>
+          <p id="selectedBrief" class="brief"></p>
+          <div class="intel-grid">
+            <div>
+              <span>Shield Nodes</span>
+              <strong id="intelNodes">3</strong>
+            </div>
+            <div>
+              <span>Defenders</span>
+              <strong id="intelDefenders">Light</strong>
+            </div>
+            <div>
+              <span>Reward</span>
+              <strong id="intelReward">180</strong>
+            </div>
+            <div>
+              <span>Best</span>
+              <strong id="intelBest">--</strong>
+            </div>
+          </div>
+          <div class="launch-row">
+            <button id="launchButton" class="primary-button" type="button">Launch Mission</button>
+            <button id="repairButton" class="ghost-button" type="button">Repair Ship</button>
+            <button id="paintButton" class="ghost-button paint-button" type="button">🎨 Ship Paint</button>
+          </div>
+        </section>
+
+        <section class="panel shipyard">
+          <div class="panel-heading">
+            <h2>Shipyard</h2>
+            <span><strong id="bankSalvage">0</strong> salvage</span>
+          </div>
+          <div id="upgradeList" class="upgrade-list"></div>
+        </section>
+
+      </section>
+    </main>
+
+    <section id="galaxyScreen" class="screen modal hidden">
+      <div class="galaxy-warp-content">
+        <p class="eyebrow galaxy-eyebrow">STAR SYSTEM LIBERATED</p>
+        <h2 class="galaxy-title">WARPING TO NEXT SYSTEM</h2>
+        <p class="galaxy-sub">Plotting new jump coordinates…</p>
+      </div>
+    </section>
+
+    <section id="pauseScreen" class="screen modal hidden">
+      <div class="modal-panel">
+        <p class="eyebrow">Mission Paused</p>
+        <h2>Fleet Systems Holding</h2>
+        <div class="controls-grid">
+          <div><kbd>Mouse</kbd><span>Aim and fire</span></div>
+          <div><kbd>W</kbd><span>Main thrust toward reticle</span></div>
+          <div><kbd>S</kbd><span>Reverse thrust</span></div>
+          <div><kbd>A / D</kbd><span>Lateral thrusters</span></div>
+          <div><kbd>Shift</kbd><span>Brake / inertial dampener</span></div>
+          <div><kbd>Space</kbd><span>Dash burst</span></div>
+          <div><kbd>Q</kbd><span>Nova pulse</span></div>
+          <div><kbd>F</kbd><span>Seeker missile</span></div>
+          <div><kbd>R</kbd><span>Deploy allied drone (orbit)</span></div>
+          <div><kbd>G</kbd><span>Deploy drone at cursor position</span></div>
+          <div><kbd>E</kbd><span>Purge / extract</span></div>
+        </div>
+        <div class="modal-actions">
+          <button id="resumeButton" class="primary-button" type="button">Resume</button>
+          <button id="abortButton" class="ghost-button" type="button">Abort Mission</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen modal hidden">
+      <div class="modal-panel">
+        <p id="resultKicker" class="eyebrow">Mission Complete</p>
+        <h2 id="resultTitle">Colony Removed</h2>
+        <p id="resultBody" class="brief"></p>
+        <div class="intel-grid compact">
+          <div>
+            <span>Salvage</span>
+            <strong id="resultSalvage">0</strong>
+          </div>
+          <div>
+            <span>Time</span>
+            <strong id="resultTime">00:00</strong>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="continueButton" class="primary-button" type="button">Command Deck</button>
+          <button id="retryButton" class="ghost-button" type="button">Retry</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="paintScreen" class="screen modal hidden">
+      <div class="modal-panel paint-modal">
+        <div class="paint-modal-header">
+          <div>
+            <p class="eyebrow">Hangar / Customisation</p>
+            <h2>Ship Paint</h2>
+          </div>
+          <button id="closePaintButton" class="ghost-button" type="button">✕ Close</button>
+        </div>
+        <p class="brief">Select a hull colour scheme for your vessel.</p>
+        <div id="paintSwatchGrid" class="paint-swatch-grid"></div>
+        <div class="modal-actions">
+          <button id="confirmPaintButton" class="primary-button" type="button">Confirm Paint</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <div id="controlsOverlay" class="controls-overlay hidden" aria-hidden="true">
+      <p class="eyebrow">Flight Controls</p>
+      <div class="control-hints">
+        <span><kbd>Mouse</kbd> Aim / fire</span>
+        <span><kbd>W</kbd> Main thrust</span>
+        <span><kbd>A/D</kbd> Strafe</span>
+        <span><kbd>Shift</kbd> Brake</span>
+        <span><kbd>Space</kbd> Dash</span>
+        <span><kbd>F</kbd> Missile</span>
+        <span><kbd>R</kbd> Drone (orbit)</span>
+        <span><kbd>G</kbd> Drone (target)</span>
+        <span><kbd>E</kbd> Objective</span>
+      </div>
+    </div>
+    <script src="game.js"></script>
+  </body>
+</html>
