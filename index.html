@@ -220,7 +220,7 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="controlsOverlay" class="controls-overlay hidden" aria-hidden="true">
-      <p class="eyebrow">Flight Controls</p>
+      <p class="eyebrow">Flight Controls <span class="controls-dismiss">[H to close]</span></p>
       <div class="control-hints">
         <span><kbd>Mouse</kbd> Aim / fire</span>
         <span><kbd>W</kbd> Main thrust</span>
@@ -233,6 +233,30 @@
         <span><kbd>E</kbd> Objective</span>
       </div>
     </div>
+
+    <!-- Mobile touch controls -->
+    <div id="mobileControls" class="mobile-controls hidden" aria-hidden="true">
+      <!-- Left joystick zone -->
+      <div id="joystickZone" class="joystick-zone" aria-label="Movement joystick">
+        <div id="joystickBase" class="joystick-base">
+          <div id="joystickKnob" class="joystick-knob"></div>
+        </div>
+      </div>
+
+      <!-- Right side action buttons -->
+      <div class="action-buttons">
+        <button id="btnFire" class="mob-btn mob-btn-fire" type="button" aria-label="Fire">🔥</button>
+        <button id="btnDash" class="mob-btn mob-btn-dash" type="button" aria-label="Dash">⚡</button>
+        <button id="btnPulse" class="mob-btn mob-btn-pulse" type="button" aria-label="Nova Pulse">💥</button>
+        <button id="btnMissile" class="mob-btn mob-btn-missile" type="button" aria-label="Missile">🚀</button>
+        <button id="btnDrone" class="mob-btn mob-btn-drone" type="button" aria-label="Drone">🤖</button>
+        <button id="btnAction" class="mob-btn mob-btn-action" type="button" aria-label="Action (E)">⚙️</button>
+      </div>
+
+      <!-- Top-right pause button for mobile -->
+      <button id="mobPause" class="mob-pause-btn" type="button" aria-label="Pause">❚❚</button>
+    </div>
+
     <script src="game.js"></script>
   </body>
 </html>

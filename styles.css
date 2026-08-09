@@ -891,6 +891,186 @@ kbd {
   50% { opacity: 0.82; transform: scale(1.018); }
 }
 
+/* ── Controls dismiss label ───────────────────────────────────────── */
+.controls-dismiss {
+  font-size: 10px;
+  opacity: 0.55;
+  font-weight: 400;
+  margin-left: 8px;
+  letter-spacing: 0;
+}
+
+/* ── Mobile Controls ─────────────────────────────────────────────── */
+.mobile-controls {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.joystick-zone {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.joystick-base {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px solid rgba(53, 216, 255, 0.35);
+  background: rgba(5, 10, 18, 0.55);
+  box-shadow: 0 0 24px rgba(53, 216, 255, 0.12), inset 0 0 20px rgba(53, 216, 255, 0.06);
+  backdrop-filter: blur(10px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.joystick-knob {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 36%, rgba(53, 216, 255, 0.9), rgba(53, 216, 255, 0.45));
+  box-shadow: 0 0 18px rgba(53, 216, 255, 0.55);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 60ms ease;
+  pointer-events: none;
+}
+
+.action-buttons {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  grid-template-rows: repeat(2, 56px);
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.mob-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid rgba(53, 216, 255, 0.4);
+  background: rgba(5, 10, 18, 0.72);
+  color: var(--text);
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(53, 216, 255, 0.15), inset 0 0 14px rgba(53, 216, 255, 0.05);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  transition: background 80ms ease, box-shadow 80ms ease;
+}
+
+.mob-btn:active,
+.mob-btn.pressed {
+  background: rgba(53, 216, 255, 0.22);
+  box-shadow: 0 0 24px rgba(53, 216, 255, 0.5);
+}
+
+.mob-btn-fire {
+  border-color: rgba(255, 92, 122, 0.6);
+  box-shadow: 0 0 16px rgba(255, 92, 122, 0.18);
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+  grid-column: 2;
+  grid-row: 1;
+  border-radius: 50%;
+}
+
+.mob-btn-fire.pressed {
+  background: rgba(255, 92, 122, 0.28);
+  box-shadow: 0 0 28px rgba(255, 92, 122, 0.55);
+}
+
+.mob-btn-dash { border-color: rgba(53, 216, 255, 0.55); }
+.mob-btn-pulse { border-color: rgba(181, 140, 255, 0.55); }
+.mob-btn-missile { border-color: rgba(255, 209, 102, 0.55); }
+.mob-btn-drone { border-color: rgba(97, 242, 162, 0.55); }
+.mob-btn-action { border-color: rgba(97, 242, 162, 0.55); }
+
+/* Mobile pause button top-right */
+.mob-pause-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(5, 10, 18, 0.72);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Fire button hold indicator */
+.mob-btn-fire::after {
+  content: 'FIRE';
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: var(--muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Mobile HUD adjustments when mobile controls visible */
+@media (pointer: coarse) {
+  /* Shrink HUD top row to avoid overlap with mobile controls */
+  .hud-top {
+    font-size: 11px;
+  }
+  .mission-card strong,
+  .hud-right strong {
+    font-size: 14px;
+  }
+  .ability-dock {
+    display: none; /* shown via mobile buttons instead */
+  }
+  #miniMap {
+    right: 12px;
+    bottom: 148px; /* above action buttons */
+    width: 110px;
+    height: 110px;
+  }
+  .warning {
+    bottom: 148px;
+  }
+}
+
+/* ── Tablet / medium ─────────────────────────────────────────────── */
 @media (max-width: 1050px) {
   body {
     overflow: auto;
@@ -921,17 +1101,16 @@ kbd {
   }
 
   .dossier {
-    min-height: 560px;
+    min-height: 520px;
   }
 
   .hud-top {
-    grid-template-columns: 1fr;
-    right: auto;
-    width: min(520px, calc(100vw - 36px));
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr) minmax(0, 0.8fr);
+    gap: 8px;
   }
 
   .status-bank {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .hud-right {
@@ -943,28 +1122,31 @@ kbd {
     right: 18px;
     bottom: 18px;
     width: calc(100vw - 36px);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   #miniMap {
     width: 132px;
     height: 132px;
-    bottom: 94px;
+    bottom: 108px;
   }
 }
 
+/* ── Phone / small ───────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .screen {
-    padding: 16px;
+    padding: 12px;
     overflow-x: hidden;
   }
 
+  /* Command deck header */
   .deck-header {
     display: block;
   }
 
   .deck-header h1 {
-    font-size: 32px;
-    line-height: 1.02;
+    font-size: clamp(22px, 7vw, 32px);
+    line-height: 1.05;
   }
 
   .deck-header h1 span {
@@ -972,7 +1154,17 @@ kbd {
   }
 
   .deck-actions {
-    margin-top: 14px;
+    margin-top: 12px;
+  }
+
+  /* Command grid — single column */
+  .command-grid {
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  .panel {
+    padding: 14px 14px;
   }
 
   .panel-heading {
@@ -981,8 +1173,10 @@ kbd {
     gap: 4px;
   }
 
+  /* Planet list */
   .planet-button {
     grid-template-columns: 34px 1fr;
+    padding: 10px;
   }
 
   .planet-state {
@@ -990,21 +1184,120 @@ kbd {
     width: 100%;
   }
 
+  /* Dossier */
+  .dossier {
+    min-height: 480px;
+  }
+
+  .dossier h2 {
+    font-size: clamp(24px, 8vw, 34px);
+  }
+
+  .planet-orbit {
+    height: min(260px, 38vw);
+  }
+
   .intel-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .ability-dock,
-  .control-hints,
+  /* Upgrades */
+  .upgrade-row {
+    gap: 6px 10px;
+    padding: 10px;
+  }
+
+  /* HUD — condensed top bar */
+  .hud-top {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    right: auto;
+    width: min(480px, calc(100vw - 24px));
+  }
+
+  .status-bank {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .meter {
+    min-height: 38px;
+  }
+
+  .hud-right {
+    display: none; /* shown in mobile controls zone */
+  }
+
+  .mission-card {
+    padding: 8px 10px;
+  }
+
+  .mission-card strong {
+    font-size: 13px;
+    margin-top: 2px;
+  }
+
+  /* Ability dock — hide on small (mobile buttons used instead) */
+  .ability-dock {
+    display: none;
+  }
+
+  /* Mini map */
+  #miniMap {
+    width: 100px;
+    height: 100px;
+    right: 10px;
+    bottom: 148px;
+  }
+
+  .warning {
+    font-size: 11px;
+    bottom: 140px;
+  }
+
+  /* Controls overlay */
+  .control-hints {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .controls-grid {
     grid-template-columns: 1fr;
   }
 
-  .dossier h2 {
-    font-size: 34px;
+  /* Modals */
+  .modal-panel {
+    padding: 16px;
   }
 
-  .planet-orbit {
-    height: 300px;
+  .modal-panel h2 {
+    font-size: clamp(22px, 6vw, 36px);
+  }
+
+  .launch-row,
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .launch-row > *,
+  .modal-actions > * {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Paint modal */
+  .paint-modal {
+    padding: 16px;
+  }
+
+  .paint-swatch-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .paint-swatch-grid .swatch-color {
+    width: 40px;
+    height: 40px;
   }
 }

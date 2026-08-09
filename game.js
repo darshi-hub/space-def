@@ -406,6 +406,12 @@
     if (mode !== "playing") {
       ui.controlsOverlay.classList.add("hidden");
     }
+    // Show mobile controls only during active play
+    const mc = document.getElementById("mobileControls");
+    if (mc) {
+      const showMob = (mode === "playing") && window.matchMedia("(pointer: coarse)").matches;
+      mc.classList.toggle("hidden", !showMob);
+    }
     if (mode === "command") {
       renderCommandDeck();
     }
@@ -804,10 +810,9 @@
     }
     unlockAudio();
     state.selectedPlanet = index;
-    const firstControlsHint = !state.save.controlsSeen;
     state.mission = createMission(planet);
-    state.mission.controlsHintTimer = firstControlsHint ? 8 : 4;
-    if (firstControlsHint) {
+    state.mission.controlsHintTimer = 0; // overlay only shown on H key press
+    if (!state.save.controlsSeen) {
       state.save.controlsSeen = true;
       saveGame();
     }
@@ -2057,7 +2062,7 @@
     ui.missileCooldown.style.transform = `scaleX(${missilePct})`;
     ui.droneCooldown.style.transform = `scaleX(${dronePct})`;
     ui.speedBar.style.transform = `scaleX(${speedPct})`;
-    ui.controlsOverlay.classList.toggle("hidden", state.mode !== "playing" || mission.controlsHintTimer <= 0);
+    // Controls overlay is toggled by H key only — do not auto-show here
 
     if (mission.phase === "scan") {
       ui.hudObjective.textContent = `Scan recon relays: ${scannedRelays} / ${mission.relays.length}`;
@@ -3421,6 +3426,10 @@
         toggleMute();
         return;
       }
+      if (event.code === "KeyH" && state.mode === "playing") {
+        ui.controlsOverlay.classList.toggle("hidden");
+        return;
+      }
       if (event.code === "KeyF" && state.mode === "playing") {
         launchMissile(state.mission);
         return;
@@ -3528,6 +3537,201 @@
     document.addEventListener("visibilitychange", () => {
       if (document.hidden && state.mode === "playing") setMode("paused");
     });
+
+    // ── Mobile controls ──────────────────────────────────────────────
+    bindMobileControls();
+  }
+
+  function isTouchDevice() {
+    return window.matchMedia("(pointer: coarse)").matches;
+  }
+
+  function showMobileControls(show) {
+    const mc = document.getElementById("mobileControls");
+    if (!mc) return;
+    mc.classList.toggle("hidden", !show);
+  }
+
+  function bindMobileControls() {
+    if (!isTouchDevice()) return;
+
+    // Show/hide mobile controls with mode changes
+    const origSetMode = setMode;
+    // We patch setMode after initial definition (see patchSetMode call below)
+
+    const joystickZone = document.getElementById("joystickZone");
+    const joystickKnob = document.getElementById("joystickKnob");
+    const joystickBase = document.getElementById("joystickBase");
+    const btnFire = document.getElementById("btnFire");
+    const btnDash = document.getElementById("btnDash");
+    const btnPulse = document.getElementById("btnPulse");
+    const btnMissile = document.getElementById("btnMissile");
+    const btnDrone = document.getElementById("btnDrone");
+    const btnAction = document.getElementById("btnAction");
+    const mobPause = document.getElementById("mobPause");
+
+    if (!joystickZone || !btnFire) return;
+
+    // Joystick state
+    const joystick = { active: false, pointerId: null, startX: 0, startY: 0, dx: 0, dy: 0 };
+    const DEAD_ZONE = 12;
+    const MAX_RADIUS = 52;
+
+    function updateJoystick(cx, cy, tx, ty) {
+      let dx = tx - cx;
+      let dy = ty - cy;
+      const dist = Math.hypot(dx, dy);
+      const clamped = Math.min(dist, MAX_RADIUS);
+      if (dist > 0) { dx = (dx / dist) * clamped; dy = (dy / dist) * clamped; }
+      joystick.dx = dx;
+      joystick.dy = dy;
+      // Move knob visually
+      joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+      // Map to key presses
+      const fwd = dy < -DEAD_ZONE;
+      const rev = dy > DEAD_ZONE;
+      const lft = dx < -DEAD_ZONE;
+      const rgt = dx > DEAD_ZONE;
+      if (fwd) state.keys.add("KeyW"); else state.keys.delete("KeyW");
+      if (rev) state.keys.add("KeyS"); else state.keys.delete("KeyS");
+      if (lft) state.keys.add("KeyA"); else state.keys.delete("KeyA");
+      if (rgt) state.keys.add("KeyD"); else state.keys.delete("KeyD");
+    }
+
+    function resetJoystick() {
+      joystick.active = false;
+      joystick.pointerId = null;
+      joystick.dx = 0;
+      joystick.dy = 0;
+      joystickKnob.style.transform = "translate(-50%, -50%)";
+      state.keys.delete("KeyW");
+      state.keys.delete("KeyS");
+      state.keys.delete("KeyA");
+      state.keys.delete("KeyD");
+    }
+
+    joystickZone.addEventListener("pointerdown", (e) => {
+      if (state.mode !== "playing") return;
+      e.preventDefault();
+      unlockAudio();
+      joystick.active = true;
+      joystick.pointerId = e.pointerId;
+      const rect = joystickBase.getBoundingClientRect();
+      joystick.startX = rect.left + rect.width / 2;
+      joystick.startY = rect.top + rect.height / 2;
+      joystickZone.setPointerCapture(e.pointerId);
+      updateJoystick(joystick.startX, joystick.startY, e.clientX, e.clientY);
+    }, { passive: false });
+
+    joystickZone.addEventListener("pointermove", (e) => {
+      if (!joystick.active || e.pointerId !== joystick.pointerId) return;
+      e.preventDefault();
+      updateJoystick(joystick.startX, joystick.startY, e.clientX, e.clientY);
+    }, { passive: false });
+
+    joystickZone.addEventListener("pointerup", (e) => {
+      if (e.pointerId !== joystick.pointerId) return;
+      resetJoystick();
+    });
+    joystickZone.addEventListener("pointercancel", () => resetJoystick());
+
+    // Aim: touch on right half of screen moves aim
+    canvas.addEventListener("pointermove", (e) => {
+      if (state.mode !== "playing") return;
+      // Use touch position as aim for right-side touches
+      if (e.clientX > state.width * 0.45) {
+        state.mouse.x = e.clientX;
+        state.mouse.y = e.clientY;
+      }
+    });
+
+    // Fire button (hold = continuous fire)
+    btnFire.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      unlockAudio();
+      state.mouse.down = true;
+      btnFire.classList.add("pressed");
+    }, { passive: false });
+    btnFire.addEventListener("pointerup", () => {
+      state.mouse.down = false;
+      btnFire.classList.remove("pressed");
+    });
+    btnFire.addEventListener("pointercancel", () => {
+      state.mouse.down = false;
+      btnFire.classList.remove("pressed");
+    });
+
+    // Dash (Space)
+    btnDash.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      state.keys.add("Space");
+      btnDash.classList.add("pressed");
+    }, { passive: false });
+    btnDash.addEventListener("pointerup", () => {
+      state.keys.delete("Space");
+      btnDash.classList.remove("pressed");
+    });
+    btnDash.addEventListener("pointercancel", () => {
+      state.keys.delete("Space");
+      btnDash.classList.remove("pressed");
+    });
+
+    // Nova Pulse (Q)
+    btnPulse.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      state.keys.add("KeyQ");
+      btnPulse.classList.add("pressed");
+    }, { passive: false });
+    btnPulse.addEventListener("pointerup", () => {
+      state.keys.delete("KeyQ");
+      btnPulse.classList.remove("pressed");
+    });
+    btnPulse.addEventListener("pointercancel", () => {
+      state.keys.delete("KeyQ");
+      btnPulse.classList.remove("pressed");
+    });
+
+    // Missile (F)
+    btnMissile.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      if (state.mode === "playing" && state.mission) launchMissile(state.mission);
+      btnMissile.classList.add("pressed");
+      setTimeout(() => btnMissile.classList.remove("pressed"), 160);
+    }, { passive: false });
+
+    // Drone (R)
+    btnDrone.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      if (state.mode === "playing" && state.mission) deployDrone(state.mission);
+      btnDrone.classList.add("pressed");
+      setTimeout(() => btnDrone.classList.remove("pressed"), 160);
+    }, { passive: false });
+
+    // Action (E)
+    btnAction.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      state.keys.add("KeyE");
+      btnAction.classList.add("pressed");
+    }, { passive: false });
+    btnAction.addEventListener("pointerup", () => {
+      state.keys.delete("KeyE");
+      btnAction.classList.remove("pressed");
+    });
+    btnAction.addEventListener("pointercancel", () => {
+      state.keys.delete("KeyE");
+      btnAction.classList.remove("pressed");
+    });
+
+    // Mobile pause
+    if (mobPause) {
+      mobPause.addEventListener("click", () => {
+        if (state.mode === "playing" || state.mode === "paused") {
+          setMode(state.mode === "paused" ? "playing" : "paused");
+          playSfx("click");
+        }
+      });
+    }
   }
 
   // --- Story Intro ---
