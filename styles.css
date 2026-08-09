@@ -920,17 +920,6 @@ kbd {
   position: absolute;
   left: env(safe-area-inset-left);
   bottom: env(safe-area-inset-bottom);
-  width: 200px;
-  height: 200px;
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.joystick-base {
-  width: 130px;
-  height: 130px;
   border-radius: 50%;
   border: 2px solid rgba(53, 216, 255, 0.35);
   background: rgba(5, 10, 18, 0.55);
@@ -1425,5 +1414,58 @@ kbd {
     right: max(8px, env(safe-area-inset-right));
     width: 42px;
     height: 42px;
+  }
+}
+
+/* ── Portrait Rotate Overlay ── */
+.rotate-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 24px;
+}
+
+.rotate-overlay.hidden {
+  display: none !important;
+}
+
+.rotate-content {
+  max-width: 400px;
+}
+
+.rotate-icon {
+  font-size: 64px;
+  color: var(--cyan);
+  margin-bottom: 16px;
+  animation: rotate-anim 2s infinite ease-in-out;
+}
+
+@keyframes rotate-anim {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
+  100% { transform: rotate(-90deg); }
+}
+
+.rotate-content h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.rotate-content p {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+@media (pointer: coarse) and (orientation: portrait) {
+  /* We only show the overlay during gameplay, controlled via JS */
+  body.mission-active .rotate-overlay {
+    display: flex !important;
   }
 }

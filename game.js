@@ -299,6 +299,10 @@
     return Math.max(min, Math.min(max, value));
   }
 
+  function vibrate(pattern) {
+    if (navigator.vibrate) navigator.vibrate(pattern);
+  }
+
   function lerp(a, b, t) {
     return a + (b - a) * t;
   }
