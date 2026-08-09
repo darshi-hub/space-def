@@ -406,12 +406,7 @@
     if (mode !== "playing") {
       ui.controlsOverlay.classList.add("hidden");
     }
-    // Show mobile controls only during active play
-    const mc = document.getElementById("mobileControls");
-    if (mc) {
-      const showMob = (mode === "playing") && window.matchMedia("(pointer: coarse)").matches;
-      mc.classList.toggle("hidden", !showMob);
-    }
+    showMobileControls(mode === "playing" && isTouchDevice());
     if (mode === "command") {
       renderCommandDeck();
     }
@@ -3550,14 +3545,11 @@
     const mc = document.getElementById("mobileControls");
     if (!mc) return;
     mc.classList.toggle("hidden", !show);
+    mc.setAttribute("aria-hidden", String(!show));
   }
 
   function bindMobileControls() {
     if (!isTouchDevice()) return;
-
-    // Show/hide mobile controls with mode changes
-    const origSetMode = setMode;
-    // We patch setMode after initial definition (see patchSetMode call below)
 
     const joystickZone = document.getElementById("joystickZone");
     const joystickKnob = document.getElementById("joystickKnob");

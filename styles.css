@@ -125,6 +125,7 @@ body {
     radial-gradient(circle at 82% 75%, rgba(255, 209, 102, 0.1), transparent 30%),
     linear-gradient(135deg, #02040a 0%, #07101d 42%, #090816 100%);
   color: var(--text);
+  overscroll-behavior: none;
 }
 
 button {
@@ -146,6 +147,7 @@ button:disabled {
   height: 100vh;
   display: block;
   background: #03050b;
+  touch-action: none;
 }
 
 .hidden {
@@ -162,6 +164,12 @@ button:disabled {
 
 .screen.active {
   display: block;
+}
+
+#commandDeck {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .deck-header {
@@ -1072,17 +1080,21 @@ kbd {
 
 /* ── Tablet / medium ─────────────────────────────────────────────── */
 @media (max-width: 1050px) {
-  body {
-    overflow: auto;
-  }
-
   #gameCanvas {
     min-height: 100vh;
   }
 
-  .screen {
-    position: absolute;
-    min-height: 100vh;
+  #commandDeck {
+    padding-bottom: 24px;
+  }
+
+  .modal {
+    align-items: start;
+    overflow-y: auto;
+  }
+
+  .modal-panel {
+    margin: auto 0;
   }
 
   .command-grid {
@@ -1299,5 +1311,119 @@ kbd {
   .paint-swatch-grid .swatch-color {
     width: 40px;
     height: 40px;
+  }
+}
+
+/* Keep the two control clusters separate on narrow phones. */
+@media (pointer: coarse) and (max-width: 390px) {
+  .joystick-zone {
+    width: 132px;
+    height: 148px;
+  }
+
+  .joystick-base {
+    width: 110px;
+    height: 110px;
+  }
+
+  .joystick-knob {
+    width: 44px;
+    height: 44px;
+  }
+
+  .action-buttons {
+    right: 8px;
+    bottom: 8px;
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(2, 52px);
+    gap: 8px;
+  }
+
+  .mob-btn {
+    width: 52px;
+    height: 52px;
+  }
+
+  .mob-btn-fire {
+    width: 58px;
+    height: 58px;
+  }
+}
+
+/* Landscape phones have little vertical play space: retain the combat HUD, not the map. */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+  .hud-top {
+    top: 8px;
+    left: 8px;
+    width: min(420px, calc(100vw - 72px));
+  }
+
+  .mission-card,
+  .hud-right,
+  #miniMap {
+    display: none;
+  }
+
+  .status-bank {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .meter {
+    min-height: 34px;
+    padding: 4px;
+  }
+
+  .hud span {
+    font-size: 9px;
+  }
+
+  .meter b {
+    margin-top: 1px;
+    font-size: 12px;
+  }
+
+  .warning {
+    bottom: 8px;
+    max-width: calc(100vw - 320px);
+    font-size: 10px;
+  }
+
+  .joystick-zone {
+    width: 148px;
+    height: 148px;
+  }
+
+  .joystick-base {
+    width: 110px;
+    height: 110px;
+  }
+
+  .action-buttons {
+    right: 8px;
+    bottom: 8px;
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(2, 48px);
+    gap: 7px;
+  }
+
+  .mob-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 17px;
+  }
+
+  .mob-btn-fire {
+    width: 54px;
+    height: 54px;
+    font-size: 19px;
+  }
+
+  .mob-pause-btn {
+    top: 8px;
+    right: 8px;
+    width: 42px;
+    height: 42px;
   }
 }
