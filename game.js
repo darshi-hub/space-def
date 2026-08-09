@@ -401,6 +401,7 @@
 
   function setMode(mode) {
     state.mode = mode;
+    document.body.classList.toggle("mission-active", mode === "playing");
     if (ui.storyScreen) ui.storyScreen.classList.toggle("hidden", mode !== "story");
     ui.commandDeck.classList.toggle("hidden", mode !== "command");
     ui.hud.classList.toggle("hidden", mode !== "playing" && mode !== "paused");
@@ -854,6 +855,7 @@
         ? `${next.name} has been added to the Solar Front.`
         : "The Solar System is liberated. Helios Fleet advances to the next star system.";
       playSfx("victory");
+      vibrate([30, 50, 30]);
       if (!next) {
         // All planets liberated — trigger galaxy travel after 2.5s
         setTimeout(() => startGalaxyTravel(), 2500);
@@ -865,6 +867,7 @@
       ui.resultTitle.textContent = "Ship Recovered";
       ui.resultBody.textContent = "Emergency crews salvaged what they could from the combat zone.";
       playSfx("fail");
+      vibrate([50, 100, 50]);
     }
     ui.resultSalvage.textContent = totalSalvage.toLocaleString();
     ui.resultTime.textContent = formatTime(time);
@@ -1274,6 +1277,7 @@
       });
     });
     playSfx("shot");
+    vibrate(10);
   }
 
   function dashPlayer(mission) {
@@ -1295,6 +1299,7 @@
       });
     }
     playSfx("dash");
+    vibrate(25);
   }
 
   function novaPulse(mission) {
@@ -1325,6 +1330,7 @@
       });
     }
     playSfx("pulse");
+    vibrate(40);
   }
 
   function launchMissile(mission) {
@@ -1353,6 +1359,7 @@
     });
     mission.shake = Math.max(mission.shake, 4);
     playSfx("missile");
+    vibrate(15);
   }
 
   function deployDrone(mission) {
@@ -1376,6 +1383,7 @@
     addCombo(mission, 0.08);
     burst(mission, p.x, p.y, 24, "rgba(53, 216, 255, 0.75)");
     playSfx("drone");
+    vibrate(15);
     showToast(count > 1 ? "Drone wing deployed." : "Escort drone deployed.");
   }
 
@@ -1399,6 +1407,7 @@
     addCombo(mission, 0.1);
     burst(mission, p.x, p.y, 18, "rgba(53, 216, 255, 0.75)");
     playSfx("drone");
+    vibrate(15);
     showToast("Combat drone deployed at target position.");
   }
 
@@ -1509,6 +1518,7 @@
       let remove = b.life <= 0 || outsideWorld(mission, b, 80);
       if (!remove && Math.hypot(p.x - b.x, p.y - b.y) < 22 + b.r) {
         hurtPlayer(mission, b.damage);
+        vibrate(50);
         remove = true;
       }
       if (remove) {
@@ -3572,7 +3582,11 @@
     const target = document.documentElement;
     const request = target.requestFullscreen || target.webkitRequestFullscreen;
     if (!request) return;
-    Promise.resolve(request.call(target)).catch(() => {
+    Promise.resolve(request.call(target)).then(() => {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock("landscape").catch(() => {});
+      }
+    }).catch(() => {
       // Some mobile browsers do not permit fullscreen; gameplay remains usable.
     });
   }
@@ -3647,6 +3661,12 @@
       state.keys.delete("KeyS");
       state.keys.delete("KeyA");
       state.keys.delete("KeyD");
+      
+      // Reset base position visually
+      joystickBase.style.position = "";
+      joystickBase.style.left = "";
+      joystickBase.style.top = "";
+      joystickBase.style.transform = "";
     }
 
     joystickZone.addEventListener("pointerdown", (e) => {
@@ -3656,9 +3676,21 @@
       unlockAudio();
       joystick.active = true;
       joystick.pointerId = e.pointerId;
-      const rect = joystickBase.getBoundingClientRect();
-      joystick.startX = rect.left + rect.width / 2;
-      joystick.startY = rect.top + rect.height / 2;
+      
+      const zoneRect = joystickZone.getBoundingClientRect();
+      const touchX = e.clientX - zoneRect.left;
+      const touchY = e.clientY - zoneRect.top;
+
+      // Position the base where the user touched within the zone
+      joystickBase.style.position = "absolute";
+      joystickBase.style.left = touchX + "px";
+      joystickBase.style.top = touchY + "px";
+      joystickBase.style.transform = "translate(-50%, -50%)";
+
+      const baseRect = joystickBase.getBoundingClientRect();
+      joystick.startX = baseRect.left + baseRect.width / 2;
+      joystick.startY = baseRect.top + baseRect.height / 2;
+      
       try {
         joystickZone.setPointerCapture(e.pointerId);
       } catch {
