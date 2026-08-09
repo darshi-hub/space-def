@@ -237,6 +237,7 @@
     save: loadSave(),
     keys: new Set(),
     mouse: { x: 0, y: 0, worldX: 0, worldY: 0, down: false },
+    touchInput: { x: 0, y: 0 },
     width: 1,
     height: 1,
     dpr: 1,
@@ -405,6 +406,10 @@
     if (galaxyScreen) galaxyScreen.classList.toggle("hidden", mode !== "galaxy");
     if (mode !== "playing") {
       ui.controlsOverlay.classList.add("hidden");
+      clearTouchMovement();
+    }
+    if (mode !== "playing" && mode !== "paused") {
+      exitMissionFullscreen();
     }
     showMobileControls(mode === "playing" && isTouchDevice());
     if (mode === "command") {
@@ -815,6 +820,8 @@
     state.camera.y = Math.max(0, state.mission.player.y - state.height * 0.5);
     state.keys.clear();
     state.mouse.down = false;
+    clearTouchMovement();
+    requestMissionFullscreen();
     setMode("playing");
     playSfx("launch");
     showToast(`${planet.name} mission launched.`);
@@ -991,19 +998,31 @@
   function updatePlayer(mission, dt) {
     const p = mission.player;
     const stats = mission.stats;
-    p.angle = Math.atan2(state.mouse.worldY - p.y, state.mouse.worldX - p.x);
+    const touchControls = isTouchDevice();
+    const touchMagnitude = Math.min(1, Math.hypot(state.touchInput.x, state.touchInput.y));
+    const touchMoving = touchControls && touchMagnitude > 0;
 
-    const forward = state.keys.has("KeyW") || state.keys.has("ArrowUp");
-    const reverse = state.keys.has("KeyS") || state.keys.has("ArrowDown");
-    const left = state.keys.has("KeyA") || state.keys.has("ArrowLeft");
-    const right = state.keys.has("KeyD") || state.keys.has("ArrowRight");
+    if (!touchControls) {
+      p.angle = Math.atan2(state.mouse.worldY - p.y, state.mouse.worldX - p.x);
+    }
+
+    const forward = !touchControls && (state.keys.has("KeyW") || state.keys.has("ArrowUp"));
+    const reverse = !touchControls && (state.keys.has("KeyS") || state.keys.has("ArrowDown"));
+    const left = !touchControls && (state.keys.has("KeyA") || state.keys.has("ArrowLeft"));
+    const right = !touchControls && (state.keys.has("KeyD") || state.keys.has("ArrowRight"));
     const brake = state.keys.has("ShiftLeft") || state.keys.has("ShiftRight");
     const mainThrust = (forward ? 1 : 0) - (reverse ? 0.62 : 0);
     const sideThrust = (right ? 1 : 0) - (left ? 1 : 0);
-    const activeThrust = Math.abs(mainThrust) > 0 || Math.abs(sideThrust) > 0;
+    const activeThrust = touchMoving || Math.abs(mainThrust) > 0 || Math.abs(sideThrust) > 0;
     const sideAngle = p.angle + Math.PI / 2;
 
-    if (mainThrust !== 0) {
+    if (touchMoving) {
+      const moveX = state.touchInput.x / touchMagnitude;
+      const moveY = state.touchInput.y / touchMagnitude;
+      p.angle = Math.atan2(moveY, moveX);
+      p.vx += moveX * touchMagnitude * stats.acceleration * dt;
+      p.vy += moveY * touchMagnitude * stats.acceleration * dt;
+    } else if (mainThrust !== 0) {
       p.vx += Math.cos(p.angle) * mainThrust * stats.acceleration * dt;
       p.vy += Math.sin(p.angle) * mainThrust * stats.acceleration * dt;
     }
@@ -1034,7 +1053,7 @@
     p.x = clamp(p.x, 34, mission.world.width - 34);
     p.y = clamp(p.y, 34, mission.world.height - 34);
     p.thrust = {
-      forward: forward ? 1 : 0,
+      forward: touchMoving ? touchMagnitude : (forward ? 1 : 0),
       reverse: reverse ? 1 : 0,
       strafe: sideThrust,
       brake,
@@ -2292,7 +2311,7 @@
     mission.particles.forEach(drawParticle);
     ctx.restore();
     drawGuidance(mission);
-    drawReticle(mission);
+    if (!isTouchDevice()) drawReticle(mission);
     renderVignette();
     renderDamageOverlay(mission);
     renderMiniMap(mission);
@@ -3443,6 +3462,7 @@
       state.keys.delete(event.code);
     });
     window.addEventListener("pointermove", (event) => {
+      if (isTouchDevice()) return;
       state.mouse.x = event.clientX;
       state.mouse.y = event.clientY;
     });
@@ -3452,12 +3472,14 @@
     canvas.addEventListener("pointerdown", (event) => {
       if (state.mode === "story") { setMode("command"); return; }
       if (state.mode !== "playing") return;
+      if (isTouchDevice()) return;
       event.preventDefault();
       unlockAudio();
       state.mouse.down = true;
       canvas.setPointerCapture(event.pointerId);
     });
     canvas.addEventListener("pointerup", (event) => {
+      if (isTouchDevice()) return;
       state.mouse.down = false;
       try {
         canvas.releasePointerCapture(event.pointerId);
@@ -3541,6 +3563,32 @@
     return window.matchMedia("(pointer: coarse)").matches;
   }
 
+  function requestMissionFullscreen() {
+    if (!isTouchDevice() || document.fullscreenElement || document.webkitFullscreenElement) return;
+    const target = document.documentElement;
+    const request = target.requestFullscreen || target.webkitRequestFullscreen;
+    if (!request) return;
+    Promise.resolve(request.call(target)).catch(() => {
+      // Some mobile browsers do not permit fullscreen; gameplay remains usable.
+    });
+  }
+
+  function exitMissionFullscreen() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) return;
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!exit) return;
+    Promise.resolve(exit.call(document)).catch(() => {
+      // A user can also leave fullscreen directly with the browser's controls.
+    });
+  }
+
+  function clearTouchMovement() {
+    state.touchInput.x = 0;
+    state.touchInput.y = 0;
+    const joystickKnob = document.getElementById("joystickKnob");
+    if (joystickKnob) joystickKnob.style.transform = "translate(-50%, -50%)";
+  }
+
   function showMobileControls(show) {
     const mc = document.getElementById("mobileControls");
     if (!mc) return;
@@ -3580,15 +3628,9 @@
       // Move knob visually
       joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
 
-      // Map to key presses
-      const fwd = dy < -DEAD_ZONE;
-      const rev = dy > DEAD_ZONE;
-      const lft = dx < -DEAD_ZONE;
-      const rgt = dx > DEAD_ZONE;
-      if (fwd) state.keys.add("KeyW"); else state.keys.delete("KeyW");
-      if (rev) state.keys.add("KeyS"); else state.keys.delete("KeyS");
-      if (lft) state.keys.add("KeyA"); else state.keys.delete("KeyA");
-      if (rgt) state.keys.add("KeyD"); else state.keys.delete("KeyD");
+      const inputMagnitude = clamped / MAX_RADIUS;
+      state.touchInput.x = inputMagnitude > DEAD_ZONE / MAX_RADIUS ? dx / MAX_RADIUS : 0;
+      state.touchInput.y = inputMagnitude > DEAD_ZONE / MAX_RADIUS ? dy / MAX_RADIUS : 0;
     }
 
     function resetJoystick() {
@@ -3596,7 +3638,7 @@
       joystick.pointerId = null;
       joystick.dx = 0;
       joystick.dy = 0;
-      joystickKnob.style.transform = "translate(-50%, -50%)";
+      clearTouchMovement();
       state.keys.delete("KeyW");
       state.keys.delete("KeyS");
       state.keys.delete("KeyA");
@@ -3605,6 +3647,7 @@
 
     joystickZone.addEventListener("pointerdown", (e) => {
       if (state.mode !== "playing") return;
+      if (joystick.active) return;
       e.preventDefault();
       unlockAudio();
       joystick.active = true;
@@ -3612,7 +3655,11 @@
       const rect = joystickBase.getBoundingClientRect();
       joystick.startX = rect.left + rect.width / 2;
       joystick.startY = rect.top + rect.height / 2;
-      joystickZone.setPointerCapture(e.pointerId);
+      try {
+        joystickZone.setPointerCapture(e.pointerId);
+      } catch {
+        // The global pointer-up handler below still resets the joystick.
+      }
       updateJoystick(joystick.startX, joystick.startY, e.clientX, e.clientY);
     }, { passive: false });
 
@@ -3622,21 +3669,15 @@
       updateJoystick(joystick.startX, joystick.startY, e.clientX, e.clientY);
     }, { passive: false });
 
-    joystickZone.addEventListener("pointerup", (e) => {
-      if (e.pointerId !== joystick.pointerId) return;
+    function finishJoystick(e) {
+      if (!joystick.active || e.pointerId !== joystick.pointerId) return;
       resetJoystick();
-    });
-    joystickZone.addEventListener("pointercancel", () => resetJoystick());
+    }
 
-    // Aim: touch on right half of screen moves aim
-    canvas.addEventListener("pointermove", (e) => {
-      if (state.mode !== "playing") return;
-      // Use touch position as aim for right-side touches
-      if (e.clientX > state.width * 0.45) {
-        state.mouse.x = e.clientX;
-        state.mouse.y = e.clientY;
-      }
-    });
+    joystickZone.addEventListener("pointerup", finishJoystick);
+    joystickZone.addEventListener("pointercancel", finishJoystick);
+    joystickZone.addEventListener("lostpointercapture", () => resetJoystick());
+    window.addEventListener("pointerup", finishJoystick);
 
     // Fire button (hold = continuous fire)
     btnFire.addEventListener("pointerdown", (e) => {
