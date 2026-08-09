@@ -525,9 +525,9 @@ button:disabled {
 
 .hud-top {
   position: absolute;
-  top: 18px;
-  left: 18px;
-  right: 18px;
+  top: max(18px, env(safe-area-inset-top));
+  left: max(18px, env(safe-area-inset-left));
+  right: max(18px, env(safe-area-inset-right));
   display: grid;
   grid-template-columns: minmax(210px, 0.8fr) minmax(360px, 1.4fr) minmax(180px, 0.5fr);
   gap: 12px;
@@ -918,8 +918,8 @@ kbd {
 
 .joystick-zone {
   position: absolute;
-  left: 0;
-  bottom: 0;
+  left: env(safe-area-inset-left);
+  bottom: env(safe-area-inset-bottom);
   width: 200px;
   height: 200px;
   pointer-events: auto;
@@ -958,8 +958,8 @@ kbd {
 
 .action-buttons {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
   display: grid;
   grid-template-columns: repeat(3, 56px);
   grid-template-rows: repeat(2, 56px);
@@ -1018,8 +1018,8 @@ kbd {
 /* Mobile pause button top-right */
 .mob-pause-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
   width: 48px;
   height: 48px;
   border-radius: 10px;
@@ -1315,7 +1315,7 @@ kbd {
 }
 
 /* Keep the two control clusters separate on narrow phones. */
-@media (pointer: coarse) and (max-width: 390px) {
+@media (pointer: coarse) and (max-width: 420px) {
   .joystick-zone {
     width: 132px;
     height: 148px;
@@ -1332,8 +1332,8 @@ kbd {
   }
 
   .action-buttons {
-    right: 8px;
-    bottom: 8px;
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
     grid-template-columns: repeat(3, 52px);
     grid-template-rows: repeat(2, 52px);
     gap: 8px;
@@ -1353,8 +1353,8 @@ kbd {
 /* Landscape phones have little vertical play space: retain the combat HUD, not the map. */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
   .hud-top {
-    top: 8px;
-    left: 8px;
+    top: max(8px, env(safe-area-inset-top));
+    left: max(8px, env(safe-area-inset-left));
     width: min(420px, calc(100vw - 72px));
   }
 
@@ -1401,8 +1401,8 @@ kbd {
   }
 
   .action-buttons {
-    right: 8px;
-    bottom: 8px;
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
     grid-template-columns: repeat(3, 48px);
     grid-template-rows: repeat(2, 48px);
     gap: 7px;
@@ -1421,8 +1421,8 @@ kbd {
   }
 
   .mob-pause-btn {
-    top: 8px;
-    right: 8px;
+    top: max(8px, env(safe-area-inset-top));
+    right: max(8px, env(safe-area-inset-right));
     width: 42px;
     height: 42px;
   }
