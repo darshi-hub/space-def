@@ -3374,6 +3374,13 @@
     master.gain.value = 0.045;
     master.connect(context.destination);
     state.audio = { context, master };
+
+    if (!state.bgm) {
+      state.bgm = new Audio("Loyalty_Freak_Music_-_02_-_High_Technologic_Beat_Explosion.mp3");
+      state.bgm.loop = true;
+      state.bgm.volume = 0.4;
+    }
+    state.bgm.play().catch(() => {});
   }
 
   function playSfx(kind) {
@@ -3419,10 +3426,16 @@
   function toggleMute() {
     state.save.muted = !state.save.muted;
     saveGame();
-    if (state.save.muted && state.audio) {
-      state.audio.context.close();
-      state.audio = null;
+    if (state.save.muted) {
+      if (state.audio) {
+        state.audio.context.close();
+        state.audio = null;
+      }
+      if (state.bgm) {
+        state.bgm.pause();
+      }
     } else {
+      unlockAudio();
       playSfx("click");
     }
     renderCommandDeck();
