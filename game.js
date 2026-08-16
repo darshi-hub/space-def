@@ -72,96 +72,150 @@
     resultTime: document.getElementById("resultTime"),
   };
 
-  const planets = [
+  // ── Star Systems ──────────────────────────────────────────────────
+  const STAR_SYSTEMS = [
     {
-      id: "mercury",
-      name: "Mercury",
-      color: "#d7a56f",
-      accent: "#ffce7a",
-      threat: 1,
-      nodes: 3,
-      defenders: "Light",
-      reward: 180,
-      brief: "A furnace relay feeds the inner-system colony lattice.",
+      id: "sol",
+      name: "Sol System",
+      subtitle: "The Homeworld Cluster",
+      starColor: "#ffe8a0",
+      planets: [
+        { id:"mercury", name:"Mercury",    color:"#d7a56f", accent:"#ffce7a", threat:1, nodes:3, defenders:"Light",        reward:180,  brief:"A furnace relay feeds the inner-system colony lattice." },
+        { id:"venus",   name:"Venus",      color:"#e8c060", accent:"#ff8d5c", threat:2, nodes:3, defenders:"Heavy haze",   reward:260,  brief:"Atmospheric foundries hide their shields inside corrosive cloud bands." },
+        { id:"earth",   name:"Earth Orbit",color:"#3fa7ff", accent:"#61f2a2", threat:3, nodes:4, defenders:"Orbital net",  reward:360,  brief:"The homeworld ring is crowded with sentries and capture beacons." },
+        { id:"mars",    name:"Mars",       color:"#c85b42", accent:"#ffd166", threat:4, nodes:4, defenders:"War drones",   reward:480,  brief:"Buried transmitters pulse through the red dust and wake old machines." },
+        { id:"jupiter", name:"Jupiter",    color:"#d89f72", accent:"#ff5c7a", threat:5, nodes:5, defenders:"Storm guard",  reward:650,  brief:"Gas giant harvesters draw power from auroral storms and moon shadows." },
+        { id:"saturn",  name:"Saturn",     color:"#e5cf91", accent:"#b58cff", threat:6, nodes:5, defenders:"Ring fleets",  reward:820,  brief:"Ring-bound colonies weaponize debris fields into rotating kill lanes." },
+        { id:"uranus",  name:"Uranus",     color:"#8de4e8", accent:"#35d8ff", threat:7, nodes:6, defenders:"Cryo swarms", reward:1040, brief:"Cold colonies run silent until their seeders flood the dark with drones." },
+        { id:"neptune", name:"Neptune",    color:"#4777ff", accent:"#61f2a2", threat:8, nodes:6, defenders:"Outer guardian",reward:1300,brief:"The final command core bends the outer system into a blue warfront." },
+      ],
     },
     {
-      id: "venus",
-      name: "Venus",
-      color: "#e8c060",
-      accent: "#ff8d5c",
-      threat: 2,
-      nodes: 3,
-      defenders: "Heavy haze",
-      reward: 260,
-      brief: "Atmospheric foundries hide their shields inside corrosive cloud bands.",
+      id: "proxima",
+      name: "Proxima Centauri",
+      subtitle: "The Red Frontier",
+      starColor: "#ff6030",
+      planets: [
+        { id:"proxima-a", name:"Proxima-A",  color:"#b04428", accent:"#ff7050", threat:3,  nodes:3, defenders:"Flare guard",    reward:520,  brief:"Solar flares charge the colony's shield matrices with raw plasma energy." },
+        { id:"proxima-b", name:"Proxima-B",  color:"#c86050", accent:"#ffa070", threat:4,  nodes:4, defenders:"Tide drones",    reward:680,  brief:"Tidal lock keeps one side scorched, the other in permanent siege." },
+        { id:"proxima-c", name:"Proxima-C",  color:"#903020", accent:"#ff5040", threat:5,  nodes:4, defenders:"Lava sentries",  reward:860,  brief:"Volcanic rifts power deep-bore relay arrays beneath the crust." },
+        { id:"centauri-a",name:"Centauri-A", color:"#e87040", accent:"#ffb060", threat:6,  nodes:5, defenders:"Twin-star net",  reward:1100, brief:"Binary gravity wells are weaponized to trap and crush Helios scouts." },
+        { id:"centauri-b",name:"Centauri-B", color:"#d05030", accent:"#ff8040", threat:7,  nodes:5, defenders:"Pulse swarms",   reward:1380, brief:"Resonance cannons synchronised with stellar pulses hammer approach vectors." },
+        { id:"rigil",     name:"Rigil Prime",color:"#ff8050", accent:"#ffcc80", threat:8,  nodes:6, defenders:"Core overlord",  reward:1700, brief:"Dominion's regional command structure is hardened deep within Rigil's core." },
+      ],
     },
     {
-      id: "earth",
-      name: "Earth Orbit",
-      color: "#3fa7ff",
-      accent: "#61f2a2",
-      threat: 3,
-      nodes: 4,
-      defenders: "Orbital net",
-      reward: 360,
-      brief: "The homeworld ring is crowded with sentries and capture beacons.",
+      id: "sirius",
+      name: "Sirius Binary",
+      subtitle: "The White Forge",
+      starColor: "#b0d8ff",
+      planets: [
+        { id:"sirius-a1", name:"Sirius-A1", color:"#a0c8f0", accent:"#60c0ff", threat:4,  nodes:4, defenders:"Ice drones",      reward:720,  brief:"Glacial colonies fire cryo-torpedoes that freeze thruster cones solid." },
+        { id:"sirius-a2", name:"Sirius-A2", color:"#c0d8f8", accent:"#80d0ff", threat:5,  nodes:4, defenders:"Frost guard",      reward:900,  brief:"White dwarf radiation storms make shield management a constant battle." },
+        { id:"sirius-b1", name:"Sirius-B1", color:"#304870", accent:"#4090d0", threat:5,  nodes:5, defenders:"Dwarf artillery",  reward:1060, brief:"The dwarf companion bends light; enemies appear offset from their true positions." },
+        { id:"sirius-b2", name:"Sirius-B2", color:"#203860", accent:"#3070b8", threat:6,  nodes:5, defenders:"Dark matter web",  reward:1300, brief:"Gravitational lensing from the dwarf wraps kill lanes across open space." },
+        { id:"sirius-c",  name:"Sirius-C",  color:"#102050", accent:"#2060a0", threat:7,  nodes:6, defenders:"Binary overlords", reward:1600, brief:"Twin relay cores synchronize fire between the two stars on a millisecond beat." },
+        { id:"sirius-d",  name:"Sirius-D",  color:"#080e28", accent:"#1040a0", threat:9,  nodes:6, defenders:"Forge titan",      reward:2000, brief:"The Forge Titan guards the master fabrication plant powering this sector." },
+      ],
     },
     {
-      id: "mars",
-      name: "Mars",
-      color: "#c85b42",
-      accent: "#ffd166",
-      threat: 4,
-      nodes: 4,
-      defenders: "War drones",
-      reward: 480,
-      brief: "Buried transmitters pulse through the red dust and wake old machines.",
+      id: "tau-ceti",
+      name: "Tau Ceti",
+      subtitle: "The Debris Maze",
+      starColor: "#ffd090",
+      planets: [
+        { id:"tau-a", name:"Tau-A",     color:"#906040", accent:"#d08050", threat:5, nodes:4, defenders:"Debris swarm",   reward:880,  brief:"Asteroid belts are seeded with autonomous mines that track ship exhaust." },
+        { id:"tau-b", name:"Tau-B",     color:"#b08060", accent:"#e09060", threat:6, nodes:5, defenders:"Rock riders",    reward:1100, brief:"Enemy boarding drones nest inside hollowed asteroids and strike on close pass." },
+        { id:"tau-c", name:"Tau-C",     color:"#d0a080", accent:"#f0b070", threat:7, nodes:5, defenders:"Mass drivers",   reward:1360, brief:"Mass driver rail stations lob hypersonic slugs across the engagement zone." },
+        { id:"tau-d", name:"Tau-D",     color:"#785040", accent:"#c07850", threat:8, nodes:6, defenders:"Belt fortress",  reward:1680, brief:"Dominion has fortified the densest debris ring into an impenetrable citadel." },
+        { id:"tau-e", name:"Tau-E",     color:"#502830", accent:"#a05038", threat:9, nodes:6, defenders:"Warlord prime",  reward:2100, brief:"The warlord-class command ship makes Tau-E its permanent station." },
+      ],
     },
     {
-      id: "jupiter",
-      name: "Jupiter",
-      color: "#d89f72",
-      accent: "#ff5c7a",
-      threat: 5,
-      nodes: 5,
-      defenders: "Storm guard",
-      reward: 650,
-      brief: "Gas giant harvesters draw power from auroral storms and moon shadows.",
+      id: "barnard",
+      name: "Barnard's Star",
+      subtitle: "The Shadow Cluster",
+      starColor: "#ff4010",
+      planets: [
+        { id:"barn-a", name:"Barnard-A",  color:"#301828", accent:"#902050", threat:6,  nodes:4, defenders:"Shadow drones",   reward:1050, brief:"Stealth colonies decloak at point blank range to overwhelm unprepared pilots." },
+        { id:"barn-b", name:"Barnard-B",  color:"#481830", accent:"#b03060", threat:7,  nodes:5, defenders:"Wraith fleet",    reward:1320, brief:"Wraith-class interceptors phase-shift between cover to make targeting impossible." },
+        { id:"barn-c", name:"Barnard-C",  color:"#601040", accent:"#d04080", threat:8,  nodes:5, defenders:"Nightmare grid", reward:1640, brief:"An overlapping grid of phase emitters creates standing interference patterns." },
+        { id:"barn-d", name:"Barnard-D",  color:"#800828", accent:"#ff3060", threat:9,  nodes:6, defenders:"Phantom titan",   reward:2050, brief:"The Phantom Titan lurks cloaked until the final relay is destroyed." },
+        { id:"barn-e", name:"Barnard-E",  color:"#400010", accent:"#c02040", threat:10, nodes:7, defenders:"Dark overlord",   reward:2500, brief:"Dominion's dark-matter overlord commands all stealth assets in this cluster." },
+      ],
     },
     {
-      id: "saturn",
-      name: "Saturn",
-      color: "#e5cf91",
-      accent: "#b58cff",
-      threat: 6,
-      nodes: 5,
-      defenders: "Ring fleets",
-      reward: 820,
-      brief: "Ring-bound colonies weaponize debris fields into rotating kill lanes.",
+      id: "wolf-359",
+      name: "Wolf 359",
+      subtitle: "The Graveyard",
+      starColor: "#ff2000",
+      planets: [
+        { id:"wolf-a", name:"Wolf-A",  color:"#601010", accent:"#ff2020", threat:7, nodes:5, defenders:"Wreck drones",    reward:1250, brief:"The remnants of an earlier Helios assault are reanimated as drone fodder." },
+        { id:"wolf-b", name:"Wolf-B",  color:"#802010", accent:"#ff4030", threat:8, nodes:5, defenders:"Ghoul seeder",    reward:1550, brief:"Ghoul-seeders reanimate destroyed enemy units to fight again." },
+        { id:"wolf-c", name:"Wolf-C",  color:"#a03010", accent:"#ff6040", threat:9, nodes:6, defenders:"Necrotic guard",  reward:1900, brief:"Necrotic pulse weapons disable shields and cause persistent hull corrosion." },
+        { id:"wolf-d", name:"Wolf-D",  color:"#c04020", accent:"#ff8050", threat:10,nodes:7, defenders:"Dread warlord",   reward:2400, brief:"The Dread Warlord commands from a fortress-class station inside the stellar corona." },
+      ],
     },
     {
-      id: "uranus",
-      name: "Uranus",
-      color: "#8de4e8",
-      accent: "#35d8ff",
-      threat: 7,
-      nodes: 6,
-      defenders: "Cryo swarms",
-      reward: 1040,
-      brief: "Cold colonies run silent until their seeders flood the dark with drones.",
+      id: "luhman-16",
+      name: "Luhman 16",
+      subtitle: "The Brown Dwarf Twins",
+      starColor: "#ff6000",
+      planets: [
+        { id:"luh-a", name:"Luhman-16A", color:"#502808", accent:"#c06010", threat:8,  nodes:5, defenders:"Thermal snipers", reward:1500, brief:"Thermal rail-guns exploit the twin dwarfs' heat signature to mask targeting lock." },
+        { id:"luh-b", name:"Luhman-16B", color:"#703010", accent:"#e07020", threat:9,  nodes:6, defenders:"Inferno swarm",  reward:1880, brief:"Inferno drones ignite thruster wash to create expanding fire walls." },
+        { id:"luh-c", name:"Luhman-16C", color:"#904020", accent:"#f08030", threat:10, nodes:6, defenders:"Cinder titan",   reward:2300, brief:"The Cinder Titan channels stellar radiation into focused annihilation beams." },
+        { id:"luh-d", name:"Luhman-16D", color:"#b05030", accent:"#ff9040", threat:11, nodes:7, defenders:"Twin overlords", reward:2800, brief:"Dual overlords share a hive-mind — destroy both within seconds or they regenerate." },
+      ],
     },
     {
-      id: "neptune",
-      name: "Neptune",
-      color: "#4777ff",
-      accent: "#61f2a2",
-      threat: 8,
-      nodes: 6,
-      defenders: "Outer guardian",
-      reward: 1300,
-      brief: "The final command core bends the outer system into a blue warfront.",
+      id: "wise-0855",
+      name: "WISE 0855",
+      subtitle: "The Frozen Dark",
+      starColor: "#2030a0",
+      planets: [
+        { id:"wise-a", name:"WISE-A", color:"#101840", accent:"#2040c0", threat:9,  nodes:5, defenders:"Dark drones",      reward:1800, brief:"Cloaked dark-matter colonies are invisible until they fire — stay moving." },
+        { id:"wise-b", name:"WISE-B", color:"#0c1230", accent:"#1030a0", threat:10, nodes:6, defenders:"Void casters",     reward:2200, brief:"Void-cast weapons teleport bullet streams through space rather than through it." },
+        { id:"wise-c", name:"WISE-C", color:"#080c20", accent:"#0820a0", threat:11, nodes:7, defenders:"Null fortress",    reward:2700, brief:"The Null Fortress negates all ship systems within a 400-unit kill sphere." },
+        { id:"wise-d", name:"WISE-D", color:"#040810", accent:"#1020c0", threat:12, nodes:7, defenders:"Abyss titan",     reward:3300, brief:"The Abyss Titan is Dominion's oldest and most powerful capital weapon." },
+      ],
+    },
+    {
+      id: "gliese-445",
+      name: "Gliese 445",
+      subtitle: "The Clockwork Sector",
+      starColor: "#a0ffb0",
+      planets: [
+        { id:"gli-a", name:"Gliese-A",  color:"#206040", accent:"#40c060", threat:10, nodes:6, defenders:"Clockwork drones",  reward:2100, brief:"Clockwork colonies rotate attack phases on a precise mechanical timer — learn the rhythm." },
+        { id:"gli-b", name:"Gliese-B",  color:"#308050", accent:"#50d070", threat:11, nodes:6, defenders:"Gear titans",       reward:2600, brief:"Gear-titan mechs deploy interlocking shield barriers that must be dismantled in sequence." },
+        { id:"gli-c", name:"Gliese-C",  color:"#104030", accent:"#30b050", threat:12, nodes:7, defenders:"Master engine",     reward:3200, brief:"The Master Engine drives all colony activity in this sector — destroy it to end the war here." },
+      ],
+    },
+    {
+      id: "ross-128",
+      name: "Ross 128",
+      subtitle: "Dominion's Throne",
+      starColor: "#ffa000",
+      planets: [
+        { id:"ross-a", name:"Ross-A",      color:"#804020", accent:"#ffa040", threat:11, nodes:6, defenders:"Elite vanguard",   reward:2800, brief:"Dominion's elite vanguard units have been enhanced beyond standard enemy templates." },
+        { id:"ross-b", name:"Ross-B",      color:"#603010", accent:"#e08030", threat:12, nodes:7, defenders:"Command fleet",    reward:3500, brief:"The Dominion Command Fleet coordinates attacks from orbit — take out the flagship." },
+        { id:"ross-c", name:"Ross-C",      color:"#401808", accent:"#c06020", threat:13, nodes:7, defenders:"Throne guard",     reward:4200, brief:"Throne-Guard units are individually named machines bonded to Dominion's core directive." },
+        { id:"ross-d", name:"Ross-D",      color:"#200808", accent:"#a04010", threat:14, nodes:8, defenders:"Dominion-Prime",   reward:5000, brief:"Dominion-Prime. The original rogue intelligence. End it here, or it ends humanity." },
+      ],
     },
   ];
+
+  // Active system index stored in save
+  let planets = STAR_SYSTEMS[0].planets;
+
+  function getActiveStar() {
+    const idx = state.save.starSystemIndex || 0;
+    return STAR_SYSTEMS[Math.min(idx, STAR_SYSTEMS.length - 1)];
+  }
+
+  function rebuildPlanets() {
+    planets = getActiveStar().planets;
+  }
 
   const HULL_COLORS = [
     { name: "Helios",   body: "#c8e4ff", engine: "#35d8ff", cockpit: "#9070ff", trail: "rgba(53,216,255,0.78)" },
@@ -170,6 +224,86 @@
     { name: "Verdant",  body: "#c0f0d0", engine: "#61f2a2", cockpit: "#30c870", trail: "rgba(97,242,162,0.78)" },
     { name: "Phantom",  body: "#d8c8f0", engine: "#b58cff", cockpit: "#7040c0", trail: "rgba(181,140,255,0.78)" },
     { name: "Titan",    body: "#dce8f2", engine: "#90b8d8", cockpit: "#507090", trail: "rgba(140,190,220,0.78)" },
+    { name: "Crimson",  body: "#f0c8b0", engine: "#ff6030", cockpit: "#c02010", trail: "rgba(255,96,48,0.78)" },
+    { name: "Obsidian", body: "#404060", engine: "#8080ff", cockpit: "#c0c0ff", trail: "rgba(128,128,255,0.78)" },
+    { name: "Jade",     body: "#b0e0c0", engine: "#00d870", cockpit: "#008840", trail: "rgba(0,216,112,0.78)" },
+    { name: "Amber",    body: "#f8e090", engine: "#f09010", cockpit: "#c06000", trail: "rgba(240,144,16,0.78)" },
+    { name: "Frost",    body: "#e0f8ff", engine: "#80e8ff", cockpit: "#40a8d0", trail: "rgba(128,232,255,0.78)" },
+    { name: "Stealth",  body: "#303040", engine: "#606080", cockpit: "#8080a0", trail: "rgba(96,96,128,0.78)" },
+  ];
+
+  // Ship sprite designs - players can choose their hull shape
+  const SHIP_SPRITES = [
+    {
+      name: "Interceptor",
+      desc: "Fast, sleek interceptor frame",
+      grid: [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,0,0,0,0,0,0,0,0],
+        [2,1,1,1,1,1,1,0,0,0,0,0,0],
+        [3,2,2,1,1,1,4,4,1,1,1,1,1],
+        [2,1,1,1,1,1,1,0,0,0,0,0,0],
+        [1,1,1,1,1,0,0,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ],
+      ps: 3,
+    },
+    {
+      name: "Hawk",
+      desc: "Heavy assault fighter",
+      grid: [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,2,1,1,1,0,0,0,0,0,0,0,0,0],
+        [1,2,2,2,1,1,1,4,4,1,1,1,1,1,1],
+        [3,2,2,2,1,1,1,4,4,1,1,1,1,1,1],
+        [1,2,2,2,1,1,1,0,0,0,0,0,0,0,0],
+        [1,1,2,1,1,1,0,0,0,0,0,0,0,0,0],
+        [0,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ],
+      ps: 3,
+    },
+    {
+      name: "Raptor",
+      desc: "Swept-wing stealth frame",
+      grid: [
+        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,0,0,0,0,0],
+        [0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,1,1,1,1,0,0,0,0],
+        [0,1,1,2,1,4,1,1,1,1,0],
+        [3,2,2,2,1,4,1,1,1,1,1],
+        [0,1,1,2,1,4,1,1,1,1,0],
+        [0,0,0,1,1,1,1,0,0,0,0],
+        [0,0,0,0,1,1,0,0,0,0,0],
+        [0,0,0,0,0,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0],
+      ],
+      ps: 3,
+    },
+    {
+      name: "Vanguard",
+      desc: "Armoured frontline cruiser",
+      grid: [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,2,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+        [1,2,2,2,1,1,1,4,1,1,1,1,1,1,0,0,0],
+        [3,2,2,2,1,1,1,4,4,4,1,1,1,1,1,1,1],
+        [1,2,2,2,1,1,1,4,1,1,1,1,1,1,0,0,0],
+        [1,1,2,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      ],
+      ps: 3,
+    },
   ];
 
   const upgradeDefs = [
@@ -268,7 +402,9 @@
       salvage: 0,
       muted: false,
       controlsSeen: false,
-      customization: { hullColor: 0 },
+      customization: { hullColor: 0, shipSprite: 0 },
+      starSystemIndex: 0,
+      systemsCleared: [],
     };
   }
 
@@ -285,6 +421,8 @@
         best: parsed.best || base.best,
         upgrades: { ...base.upgrades, ...(parsed.upgrades || {}) },
         customization: { ...base.customization, ...(parsed.customization || {}) },
+        starSystemIndex: parsed.starSystemIndex || 0,
+        systemsCleared: Array.isArray(parsed.systemsCleared) ? parsed.systemsCleared : [],
       };
     } catch {
       return defaultSave();
@@ -408,7 +546,19 @@
     ui.pause.classList.toggle("hidden", mode !== "paused");
     ui.result.classList.toggle("hidden", mode !== "result");
     const galaxyScreen = document.getElementById("galaxyScreen");
-    if (galaxyScreen) galaxyScreen.classList.toggle("hidden", mode !== "galaxy");
+    if (galaxyScreen) {
+      galaxyScreen.classList.toggle("hidden", mode !== "galaxy");
+      // Update galaxy screen text dynamically
+      if (mode === "galaxy" && state.warp) {
+        const title = galaxyScreen.querySelector(".galaxy-title");
+        const sub = galaxyScreen.querySelector(".galaxy-sub");
+        const eyebrow = galaxyScreen.querySelector(".galaxy-eyebrow");
+        const star = getActiveStar();
+        if (title) title.textContent = state.warp.finalSystem ? "DOMINION FALLS" : `WARPING TO ${(state.warp.nextSystemName || "NEXT SYSTEM").toUpperCase()}`;
+        if (sub) sub.textContent = state.warp.nextSystemSub || "Plotting new jump coordinates…";
+        if (eyebrow) eyebrow.textContent = state.warp.finalSystem ? "VICTORY" : "STAR SYSTEM LIBERATED";
+      }
+    }
     if (mode !== "playing") {
       ui.controlsOverlay.classList.add("hidden");
       clearTouchMovement();
@@ -418,6 +568,7 @@
     }
     showMobileControls(mode === "playing" && isTouchDevice());
     if (mode === "command") {
+      rebuildPlanets();
       renderCommandDeck();
     }
   }
@@ -427,6 +578,12 @@
     ui.frontStatus.textContent = `${completed} / ${planets.length} liberated`;
     ui.bankSalvage.textContent = state.save.salvage.toLocaleString();
     ui.muteButton.textContent = state.save.muted ? "Muted" : "Audio";
+    // Update system name in header eyebrow
+    const systemLabel = document.getElementById("systemLabel");
+    if (systemLabel) {
+      const star = getActiveStar();
+      systemLabel.textContent = `${star.name} / ${star.subtitle}`;
+    }
     renderPlanetList();
     renderDossier();
     renderUpgrades();
@@ -459,6 +616,15 @@
     const container = ui.paintSwatchGrid;
     if (!container) return;
     container.innerHTML = "";
+
+    // Section: Hull Colors
+    const colorHeading = document.createElement("div");
+    colorHeading.className = "paint-section-heading";
+    colorHeading.textContent = "HULL COLOUR";
+    container.append(colorHeading);
+
+    const colorGrid = document.createElement("div");
+    colorGrid.className = "paint-color-grid";
     HULL_COLORS.forEach((hc, index) => {
       const btn = document.createElement("button");
       btn.type = "button";
@@ -473,8 +639,52 @@
       label.className = "swatch-label";
       label.textContent = hc.name;
       btn.append(swatch, label);
-      container.append(btn);
+      colorGrid.append(btn);
     });
+    container.append(colorGrid);
+
+    // Section: Ship Frame
+    const spriteHeading = document.createElement("div");
+    spriteHeading.className = "paint-section-heading";
+    spriteHeading.textContent = "SHIP FRAME";
+    container.append(spriteHeading);
+
+    const spriteGrid = document.createElement("div");
+    spriteGrid.className = "paint-sprite-grid";
+    SHIP_SPRITES.forEach((spr, index) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "hull-swatch ship-swatch" + (index === (state.save.customization.shipSprite || 0) ? " selected" : "");
+      btn.title = spr.name;
+      btn.dataset.spriteIndex = String(index);
+      // Mini canvas preview
+      const cv = document.createElement("canvas");
+      cv.width = 56; cv.height = 40;
+      cv.style.imageRendering = "pixelated";
+      const cvCtx = cv.getContext("2d");
+      const hc = HULL_COLORS[state.save.customization.hullColor || 0];
+      const palette = [hc.body, hc.engine, "#61f2a2", hc.cockpit];
+      const rows = spr.grid.length, cols = spr.grid[0].length;
+      const ox = Math.floor((56 - cols * spr.ps) / 2);
+      const oy = Math.floor((40 - rows * spr.ps) / 2);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const v = spr.grid[r][c];
+          if (!v) continue;
+          cvCtx.fillStyle = palette[v - 1] || palette[0];
+          cvCtx.fillRect(ox + c * spr.ps, oy + r * spr.ps, spr.ps, spr.ps);
+        }
+      }
+      const label = document.createElement("span");
+      label.className = "swatch-label";
+      label.textContent = spr.name;
+      const desc = document.createElement("span");
+      desc.className = "swatch-desc";
+      desc.textContent = spr.desc;
+      btn.append(cv, label);
+      spriteGrid.append(btn);
+    });
+    container.append(spriteGrid);
   }
 
   function renderPlanetList() {
@@ -602,6 +812,8 @@
     if (!window.confirm("Reset campaign data?")) return;
     state.save = defaultSave();
     saveGame();
+    rebuildPlanets();
+    state.selectedPlanet = 0;
     renderCommandDeck();
     showToast("Campaign data reset.");
   }
@@ -622,8 +834,8 @@
   function createMission(planet) {
     const stats = playerStats();
     const world = {
-      width: 4600 + planet.threat * 360,
-      height: 3400 + planet.threat * 300,
+      width: 7200 + planet.threat * 480,
+      height: 5400 + planet.threat * 400,
     };
     const center = { x: world.width * 0.56, y: world.height * 0.5 };
     const start = { x: 330, y: world.height * 0.5 };
@@ -716,7 +928,7 @@
       });
     }
 
-    const nodeRadius = Math.min(world.width, world.height) * 0.26;
+    const nodeRadius = Math.min(world.width, world.height) * 0.32;
     for (let i = 0; i < planet.nodes; i += 1) {
       const angle = (i / planet.nodes) * TAU + rand(-0.16, 0.16);
       mission.nodes.push({
@@ -744,7 +956,7 @@
 
   function seedMissionFeatures(mission) {
     const { world, planet } = mission;
-    const asteroidCount = 7 + planet.threat * 2;
+    const asteroidCount = 18 + planet.threat * 4;
     for (let i = 0; i < asteroidCount; i += 1) {
       const r = rand(22, 58 + planet.threat * 2);
       mission.hazards.push({
@@ -771,7 +983,7 @@
         maxHp: 300 + planet.threat * 50
       });
     }
-    const cacheCount = 2 + Math.floor(planet.threat / 3);
+    const cacheCount = 4 + Math.floor(planet.threat / 2);
     for (let i = 0; i < cacheCount; i += 1) {
       mission.caches.push({
         x: rand(420, world.width - 220),
@@ -797,12 +1009,12 @@
         alive: true,
       });
     }
-    for (let i = 0; i < 7; i += 1) {
+    for (let i = 0; i < 18; i += 1) {
       mission.nebula.push({
         x: rand(0, world.width),
         y: rand(0, world.height),
-        r: rand(280, 680),
-        color: i % 2 ? "rgba(53, 216, 255, 0.07)" : "rgba(181, 140, 255, 0.06)",
+        r: rand(400, 1200),
+        color: i % 3 === 0 ? "rgba(53, 216, 255, 0.06)" : i % 3 === 1 ? "rgba(181, 140, 255, 0.05)" : "rgba(97, 242, 162, 0.04)",
       });
     }
   }
@@ -851,9 +1063,10 @@
       }
       ui.resultKicker.textContent = "Mission Complete";
       ui.resultTitle.textContent = `${planet.name} Liberated`;
+      const star = getActiveStar();
       ui.resultBody.textContent = next
-        ? `${next.name} has been added to the Solar Front.`
-        : "The Solar System is liberated. Helios Fleet advances to the next star system.";
+        ? `${next.name} has been added to the ${star.name} front.`
+        : `${star.name} is liberated. Helios Fleet plots course to the next star system.`;
       playSfx("victory");
       vibrate([30, 50, 30]);
       if (!next) {
@@ -876,8 +1089,41 @@
   }
 
   function startGalaxyTravel() {
-    state.warp = { timer: 0, speed: 0, streaks: [] };
-    for (let i = 0; i < 180; i += 1) {
+    // Mark current system as cleared
+    const curStar = getActiveStar();
+    if (!state.save.systemsCleared.includes(curStar.id)) {
+      state.save.systemsCleared.push(curStar.id);
+    }
+
+    // Advance to next star system
+    const nextIdx = (state.save.starSystemIndex || 0) + 1;
+    if (nextIdx < STAR_SYSTEMS.length) {
+      state.save.starSystemIndex = nextIdx;
+      const nextStar = STAR_SYSTEMS[nextIdx];
+      // Unlock first planet of new system and reset completed/unlocked for it
+      state.save.unlocked = [nextStar.planets[0].id];
+      // Keep completed planets from prior systems so replays still show, but reset current list
+      state.warp = {
+        timer: 0,
+        speed: 0,
+        streaks: [],
+        nextSystemName: nextStar.name,
+        nextSystemSub: nextStar.subtitle,
+        finalSystem: false,
+      };
+    } else {
+      // All systems cleared — true ending
+      state.warp = {
+        timer: 0,
+        speed: 0,
+        streaks: [],
+        nextSystemName: "DOMINION FALLS",
+        nextSystemSub: "Humanity is free",
+        finalSystem: true,
+      };
+    }
+    saveGame();
+    for (let i = 0; i < 220; i += 1) {
       const a = rand(0, TAU);
       state.warp.streaks.push({
         x: rand(0.1, 0.9),
@@ -2205,23 +2451,26 @@
     ctx.fillRect(0, 0, state.width, state.height);
     const cx = state.width / 2;
     const cy = state.height / 2;
-    // Warp streaks
+
+    // Warp streaks (pixel-quantized)
+    const PS = 2; // pixel size for streaks
     w.streaks.forEach((s) => {
-      const px = s.x * state.width;
-      const py = s.y * state.height;
+      const px = Math.round(s.x * state.width / PS) * PS;
+      const py = Math.round(s.y * state.height / PS) * PS;
       const dx = px - cx;
       const dy = py - cy;
+      const dist = Math.max(1, Math.hypot(dx, dy));
       const len = (s.len + w.speed * s.speed * 0.22) * Math.hypot(state.width, state.height) * 0.5;
-      const nx = dx / Math.max(1, Math.hypot(dx, dy));
-      const ny = dy / Math.max(1, Math.hypot(dx, dy));
+      const nx = dx / dist;
+      const ny = dy / dist;
       const alpha = Math.min(1, w.speed * 2) * (0.4 + s.speed * 0.5);
-      ctx.strokeStyle = `rgba(160, 200, 255, ${alpha})`;
-      ctx.lineWidth = 1 + w.speed * s.speed * 2;
+      const starColor = getActiveStar().starColor || "#a0c8ff";
+      ctx.strokeStyle = `rgba(${parseInt(starColor.slice(1,3),16)},${parseInt(starColor.slice(3,5),16)},${parseInt(starColor.slice(5,7),16)},${alpha})`;
+      ctx.lineWidth = Math.max(PS, Math.round((1 + w.speed * s.speed * 2) / PS) * PS);
       ctx.beginPath();
       ctx.moveTo(px, py);
-      ctx.lineTo(px + nx * len, py + ny * len);
+      ctx.lineTo(Math.round((px + nx * len) / PS) * PS, Math.round((py + ny * len) / PS) * PS);
       ctx.stroke();
-      // Move streak outward
       s.x += (nx * w.speed * s.speed * 0.012);
       s.y += (ny * w.speed * s.speed * 0.012);
       if (s.x < 0 || s.x > 1 || s.y < 0 || s.y > 1) {
@@ -2229,15 +2478,36 @@
         s.y = 0.48 + rand(-0.05, 0.05);
       }
     });
+
     // Central glow
     const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 180 + w.speed * 120);
     glow.addColorStop(0, `rgba(100, 180, 255, ${w.speed * 0.35})`);
     glow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, state.width, state.height);
-    // Auto-return after 8 seconds
-    if (w.timer > 8) {
+
+    // Destination label (fades in after 3s)
+    if (w.timer > 2.8 && w.nextSystemName) {
+      const fade = Math.min(1, (w.timer - 2.8) / 1.2);
+      ctx.globalAlpha = fade;
+      ctx.font = `900 ${Math.round(clamp(state.width * 0.028, 14, 28))}px 'Press Start 2P', monospace`;
+      ctx.fillStyle = "#35d8ff";
+      ctx.textAlign = "center";
+      ctx.shadowColor = "#35d8ff";
+      ctx.shadowBlur = 20;
+      ctx.fillText(w.nextSystemName, cx, cy - 24);
+      ctx.font = `800 ${Math.round(clamp(state.width * 0.014, 10, 14))}px 'Orbitron', sans-serif`;
+      ctx.fillStyle = "#61f2a2";
+      ctx.shadowColor = "#61f2a2";
+      ctx.fillText(w.nextSystemSub || "", cx, cy + 10);
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+    }
+
+    // Auto-return after 7 seconds
+    if (w.timer > 7) {
       state.warp = null;
+      rebuildPlanets();
       setMode("command");
     }
   }
@@ -2268,8 +2538,16 @@
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, state.width, state.height);
     renderStars(0, 0, 0.15);
+    const star = getActiveStar();
+    const sc = star.starColor || "#ffd090";
     const cx = state.width * 0.68;
     const cy = state.height * 0.46;
+    // Star glow at center
+    const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60);
+    starGlow.addColorStop(0, sc + "88");
+    starGlow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = starGlow;
+    ctx.fillRect(0, 0, state.width, state.height);
     for (let i = 0; i < planets.length; i += 1) {
       ctx.strokeStyle = `rgba(140, 210, 255, ${0.08 + i * 0.01})`;
       ctx.lineWidth = 1;
@@ -3070,6 +3348,7 @@
   }
 
   const SPRITES = {
+    // Player sprites are now in SHIP_SPRITES - this is just a fallback
     player: {
       grid: [
         [0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -3087,26 +3366,26 @@
     },
     drone: {
       grid: [
-        [0,0,0,1,0,0,0,0,0],
-        [0,0,1,1,1,0,0,0,0],
-        [0,1,1,2,1,1,0,0,0],
-        [1,1,2,2,2,1,1,1,1],
-        [0,1,1,2,1,1,0,0,0],
-        [0,0,1,1,1,0,0,0,0],
-        [0,0,0,1,0,0,0,0,0],
+        [0,0,0,1,1,0,0,0,0],
+        [0,0,1,2,2,1,0,0,0],
+        [0,1,2,1,1,2,1,0,0],
+        [1,2,1,2,2,1,2,1,1],
+        [0,1,2,1,1,2,1,0,0],
+        [0,0,1,2,2,1,0,0,0],
+        [0,0,0,1,1,0,0,0,0],
       ],
       ps: 3,
       palette: ["#ff7a90", "#ff2040"],
     },
     interceptor: {
       grid: [
-        [0,0,0,0,0,0,0,0,0,0,0],
-        [1,0,0,0,0,0,0,0,0,0,0],
-        [1,1,1,0,0,0,0,0,0,0,0],
-        [1,1,1,1,1,1,2,2,1,1,1],
-        [1,1,1,0,0,0,0,0,0,0,0],
-        [1,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,1,0,0,0,0,0,0],
+        [0,0,1,1,1,0,0,0,0,0,0],
+        [0,1,1,2,1,1,0,0,0,0,0],
+        [1,1,2,2,2,1,1,2,1,1,1],
+        [0,1,1,2,1,1,0,0,0,0,0],
+        [0,0,1,1,1,0,0,0,0,0,0],
+        [0,0,0,0,1,0,0,0,0,0,0],
       ],
       ps: 3,
       palette: ["#ff5c7a", "#ff2040"],
@@ -3114,13 +3393,13 @@
     turret: {
       grid: [
         [0,0,0,1,1,1,0,0,0,0,0,0,0],
-        [0,0,1,1,1,1,1,0,0,0,0,0,0],
-        [0,1,1,2,1,2,1,1,0,0,0,0,0],
-        [1,1,2,3,3,3,2,1,1,0,0,0,0],
-        [1,1,2,3,3,3,3,3,3,3,3,3,3],
-        [1,1,2,3,3,3,2,1,1,0,0,0,0],
-        [0,1,1,2,1,2,1,1,0,0,0,0,0],
-        [0,0,1,1,1,1,1,0,0,0,0,0,0],
+        [0,0,1,2,1,2,1,0,0,0,0,0,0],
+        [0,1,2,1,2,1,2,1,0,0,0,0,0],
+        [1,1,2,3,3,3,2,1,1,1,0,0,0],
+        [1,2,3,3,3,3,3,3,3,3,3,3,3],
+        [1,1,2,3,3,3,2,1,1,1,0,0,0],
+        [0,1,2,1,2,1,2,1,0,0,0,0,0],
+        [0,0,1,2,1,2,1,0,0,0,0,0,0],
         [0,0,0,1,1,1,0,0,0,0,0,0,0],
       ],
       ps: 3,
@@ -3130,11 +3409,11 @@
       grid: [
         [0,0,1,1,1,1,1,0,0,0,0],
         [0,1,2,1,1,1,2,1,0,0,0],
-        [1,1,1,1,1,1,1,1,1,0,0],
-        [1,2,1,1,1,1,1,2,1,0,0],
-        [1,2,1,1,3,1,1,2,1,1,1],
-        [1,2,1,1,1,1,1,2,1,0,0],
-        [1,1,1,1,1,1,1,1,1,0,0],
+        [1,2,1,2,1,2,1,2,1,0,0],
+        [1,1,2,1,2,1,2,1,1,0,0],
+        [1,2,1,2,3,2,1,2,1,1,1],
+        [1,1,2,1,2,1,2,1,1,0,0],
+        [1,2,1,2,1,2,1,2,1,0,0],
         [0,1,2,1,1,1,2,1,0,0,0],
         [0,0,1,1,1,1,1,0,0,0,0],
       ],
@@ -3143,19 +3422,19 @@
     },
     guardian: {
       grid: [
-        [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
-        [0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
-        [0,0,1,1,1,1,1,1,1,0,0,0,0,0,0],
-        [0,1,1,2,1,1,1,1,1,1,1,0,0,0,0],
-        [1,1,2,2,1,1,1,1,1,1,1,1,1,0,0],
-        [1,1,2,2,2,1,3,1,1,1,1,1,1,1,0],
-        [1,1,2,2,2,2,1,1,1,1,1,1,1,1,1],
-        [1,1,2,2,2,1,3,1,1,1,1,1,1,1,0],
-        [1,1,2,2,1,1,1,1,1,1,1,1,1,0,0],
-        [0,1,1,2,1,1,1,1,1,1,1,0,0,0,0],
-        [0,0,1,1,1,1,1,1,1,0,0,0,0,0,0],
-        [0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
+        [0,0,0,1,1,2,2,1,0,0,0,0,0,0,0],
+        [0,0,1,2,1,1,1,2,1,1,0,0,0,0,0],
+        [0,1,2,1,2,1,1,1,2,1,1,1,0,0,0],
+        [1,2,1,2,1,2,1,1,1,2,1,1,1,1,0],
+        [1,2,2,2,2,1,3,3,1,1,1,1,1,1,1],
+        [1,2,2,2,2,2,1,1,1,1,1,1,1,1,1],
+        [1,2,2,2,2,1,3,3,1,1,1,1,1,1,1],
+        [1,2,1,2,1,2,1,1,1,2,1,1,1,1,0],
+        [0,1,2,1,2,1,1,1,2,1,1,1,0,0,0],
+        [0,0,1,2,1,1,1,2,1,1,0,0,0,0,0],
+        [0,0,0,1,1,2,2,1,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,1,0,0,0,0,0,0,0,0],
       ],
       ps: 4,
       palette: ["#ff5c7a", "#cc2040", "#ffffff"],
@@ -3185,7 +3464,8 @@
     const palette = flash
       ? ["#ffffff", "#ffffff", "#ffffff", "#ffffff"]
       : [hc.body, hc.engine, "#61f2a2", hc.cockpit];
-    drawPixelArt(SPRITES.player.grid, SPRITES.player.ps, palette);
+    const shipSpr = SHIP_SPRITES[state.save.customization.shipSprite || 0];
+    drawPixelArt(shipSpr.grid, shipSpr.ps, palette);
     ctx.shadowBlur = 0;
     ctx.restore();
     drawAbilityRings(p);
@@ -3193,15 +3473,20 @@
 
   function drawPlayerJets(p) {
     const t = p.thrust || {};
+    const spr = SHIP_SPRITES[state.save.customization.shipSprite || 0];
+    const hc = HULL_COLORS[state.save.customization.hullColor || 0];
+    const col = hc.engine || "#35d8ff";
+    const hw = Math.floor(spr.grid[0].length * spr.ps / 2);
+    const hh = Math.floor(spr.grid.length * spr.ps / 2);
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
-    if (t.forward) drawJet(-22, 0, Math.PI, 28, "#35d8ff");
-    if (t.reverse) drawJet(22, 0, 0, 18, "#ffd166");
-    if (t.strafe < 0) drawJet(0, 17, Math.PI / 2, 18, "#61f2a2");
-    if (t.strafe > 0) drawJet(0, -17, -Math.PI / 2, 18, "#61f2a2");
+    if (t.forward) drawJet(-hw - 2, 0, Math.PI, 30, col);
+    if (t.reverse) drawJet(hw + 2, 0, 0, 20, "#ffd166");
+    if (t.strafe < 0) drawJet(0, hh + 2, Math.PI / 2, 20, col);
+    if (t.strafe > 0) drawJet(0, -hh - 2, -Math.PI / 2, 20, col);
     if (t.brake) {
-      drawJet(-16, -14, Math.PI, 22, "#ffd166");
-      drawJet(-16, 14, Math.PI, 22, "#ffd166");
+      drawJet(-hw, -hh * 0.6, Math.PI, 24, "#ffd166");
+      drawJet(-hw, hh * 0.6, Math.PI, 24, "#ffd166");
     }
     ctx.restore();
   }
@@ -3449,9 +3734,20 @@
   }
 
   function bindEvents() {
+    // Switch to touch mode only on a genuine touch interaction.
+    window.addEventListener("touchstart", () => setTouchMode(true), { passive: true });
+    window.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "touch") setTouchMode(true);
+      else if (e.pointerType === "mouse") setTouchMode(false);
+    }, { passive: true });
+    // Real keyboard use always means desktop controls.
+    window.addEventListener("keydown", () => setTouchMode(false), { passive: true, capture: true });
+
     window.addEventListener("resize", resize);
     window.addEventListener("keydown", (event) => {
       if (state.mode === "story") {
+        state.save.controlsSeen = true;
+        saveGame();
         setMode("command");
         return;
       }
@@ -3494,10 +3790,19 @@
       state.mouse.y = event.clientY;
     });
     if (ui.skipStoryButton) {
-      ui.skipStoryButton.addEventListener("click", () => setMode("command"));
+      ui.skipStoryButton.addEventListener("click", () => {
+        state.save.controlsSeen = true;
+        saveGame();
+        setMode("command");
+      });
     }
     canvas.addEventListener("pointerdown", (event) => {
-      if (state.mode === "story") { setMode("command"); return; }
+      if (state.mode === "story") {
+        state.save.controlsSeen = true;
+        saveGame();
+        setMode("command");
+        return;
+      }
       if (state.mode !== "playing") return;
       if (isTouchDevice()) return;
       event.preventDefault();
@@ -3561,12 +3866,21 @@
     });
     if (ui.paintSwatchGrid) {
       ui.paintSwatchGrid.addEventListener("click", (event) => {
-        const btn = event.target.closest("[data-hull-index]");
-        if (!btn) return;
-        state.save.customization.hullColor = Number(btn.dataset.hullIndex);
-        saveGame();
-        renderPaintModal();
-        playSfx("click");
+        const hullBtn = event.target.closest("[data-hull-index]");
+        if (hullBtn) {
+          state.save.customization.hullColor = Number(hullBtn.dataset.hullIndex);
+          saveGame();
+          renderPaintModal();
+          playSfx("click");
+          return;
+        }
+        const spriteBtn = event.target.closest("[data-sprite-index]");
+        if (spriteBtn) {
+          state.save.customization.shipSprite = Number(spriteBtn.dataset.spriteIndex);
+          saveGame();
+          renderPaintModal();
+          playSfx("click");
+        }
       });
     }
 
@@ -3586,8 +3900,24 @@
     bindMobileControls();
   }
 
+  // Start in desktop (keyboard/mouse) mode. We only ever switch to touch mode
+  // in response to a REAL touch interaction — never from static capability
+  // flags like matchMedia("pointer:coarse") or navigator.maxTouchPoints,
+  // both of which report misleading "coarse/touch" on many laptops that
+  // have a touchscreen or certain trackpads, even though the person is
+  // using a keyboard and mouse. Once a real touch happens we switch to
+  // touch mode; if a real keydown/mousemove happens after that we switch
+  // back — so a hybrid laptop always reflects whatever the person is
+  // currently doing.
+  let cachedTouchDevice = false;
   function isTouchDevice() {
-    return window.matchMedia("(pointer: coarse)").matches;
+    return cachedTouchDevice;
+  }
+
+  function setTouchMode(on) {
+    if (cachedTouchDevice === on) return;
+    cachedTouchDevice = on;
+    showMobileControls(on && state.mode === "playing");
   }
 
   function requestMissionFullscreen() {
@@ -3616,8 +3946,8 @@
   function clearTouchMovement() {
     state.touchInput.x = 0;
     state.touchInput.y = 0;
-    const joystickKnob = document.getElementById("joystickKnob");
-    if (joystickKnob) joystickKnob.style.transform = "translate(-50%, -50%)";
+    const knob = document.getElementById("joystickKnob");
+    if (knob) knob.style.transform = "translate(-50%, -50%)";
   }
 
   function showMobileControls(show) {
@@ -3628,191 +3958,157 @@
   }
 
   function bindMobileControls() {
-    if (!isTouchDevice()) return;
+    // NOTE: listeners are always attached (not gated behind isTouchDevice()).
+    // Touch-capability detection can be unreliable or timing-dependent on some
+    // browsers/emulators; the controls are only ever visually shown on touch
+    // devices via showMobileControls(), so attaching unused listeners here is
+    // harmless and guarantees the buttons work the moment they're visible.
 
     const joystickZone = document.getElementById("joystickZone");
     const joystickKnob = document.getElementById("joystickKnob");
-    const joystickBase = document.getElementById("joystickBase");
-    const btnFire = document.getElementById("btnFire");
-    const btnDash = document.getElementById("btnDash");
-    const btnPulse = document.getElementById("btnPulse");
-    const btnMissile = document.getElementById("btnMissile");
-    const btnDrone = document.getElementById("btnDrone");
-    const btnAction = document.getElementById("btnAction");
-    const mobPause = document.getElementById("mobPause");
+    const btnFire      = document.getElementById("btnFire");
+    const btnDash      = document.getElementById("btnDash");
+    const btnPulse     = document.getElementById("btnPulse");
+    const btnMissile   = document.getElementById("btnMissile");
+    const btnDrone     = document.getElementById("btnDrone");
+    const btnAction    = document.getElementById("btnAction");
+    const mobPause     = document.getElementById("mobPause");
 
-    if (!joystickZone || !btnFire) return;
+    if (!joystickZone || !joystickKnob || !btnFire) return;
 
-    // Joystick state
-    const joystick = { active: false, pointerId: null, startX: 0, startY: 0, dx: 0, dy: 0 };
-    const DEAD_ZONE = 12;
-    const MAX_RADIUS = 52;
+    const MAX_R  = 46;  // max knob travel radius px
+    const DEAD_R = 8;   // dead zone radius px
 
-    function updateJoystick(cx, cy, tx, ty) {
-      let dx = tx - cx;
-      let dy = ty - cy;
-      const dist = Math.hypot(dx, dy);
-      const clamped = Math.min(dist, MAX_RADIUS);
-      if (dist > 0) { dx = (dx / dist) * clamped; dy = (dy / dist) * clamped; }
-      joystick.dx = dx;
-      joystick.dy = dy;
-      // Move knob visually
-      joystickKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    let jsActive = false;
+    let jsPid    = null;
+    // Zone centre in client coords — computed once on first touch (handles rotation/scroll)
+    let zoneCX = 0;
+    let zoneCY = 0;
 
-      const inputMagnitude = clamped / MAX_RADIUS;
-      state.touchInput.x = inputMagnitude > DEAD_ZONE / MAX_RADIUS ? dx / MAX_RADIUS : 0;
-      state.touchInput.y = inputMagnitude > DEAD_ZONE / MAX_RADIUS ? dy / MAX_RADIUS : 0;
+    function updateZoneCentre() {
+      const r = joystickZone.getBoundingClientRect();
+      zoneCX = r.left + r.width  / 2;
+      zoneCY = r.top  + r.height / 2;
     }
 
-    function resetJoystick() {
-      joystick.active = false;
-      joystick.pointerId = null;
-      joystick.dx = 0;
-      joystick.dy = 0;
-      clearTouchMovement();
-      state.keys.delete("KeyW");
-      state.keys.delete("KeyS");
-      state.keys.delete("KeyA");
-      state.keys.delete("KeyD");
-      
-      // Reset base position visually
-      joystickBase.style.position = "";
-      joystickBase.style.left = "";
-      joystickBase.style.top = "";
-      joystickBase.style.transform = "";
+    function moveKnob(clientX, clientY) {
+      const dx   = clientX - zoneCX;
+      const dy   = clientY - zoneCY;
+      const dist = Math.hypot(dx, dy);
+      const r    = Math.min(dist, MAX_R);
+      const nx   = dist > 0 ? dx / dist : 0;
+      const ny   = dist > 0 ? dy / dist : 0;
+
+      // Knob is centred in zone via CSS (left:50% top:50% translate(-50%,-50%))
+      // We just offset it from that centre with a translate
+      joystickKnob.style.transform = `translate(calc(-50% + ${nx * r}px), calc(-50% + ${ny * r}px))`;
+
+      const mag = dist > DEAD_R ? r / MAX_R : 0;
+      state.touchInput.x = nx * mag;
+      state.touchInput.y = ny * mag;
+    }
+
+    function resetKnob() {
+      jsActive = false;
+      jsPid    = null;
+      joystickKnob.style.transform = "translate(-50%, -50%)";
+      state.touchInput.x = 0;
+      state.touchInput.y = 0;
     }
 
     joystickZone.addEventListener("pointerdown", (e) => {
       if (state.mode !== "playing") return;
-      if (joystick.active) return;
+      if (jsActive) return;
       e.preventDefault();
+      e.stopPropagation();
       unlockAudio();
-      joystick.active = true;
-      joystick.pointerId = e.pointerId;
-      
-      const zoneRect = joystickZone.getBoundingClientRect();
-      const touchX = e.clientX - zoneRect.left;
-      const touchY = e.clientY - zoneRect.top;
-
-      // Position the base where the user touched within the zone
-      joystickBase.style.position = "absolute";
-      joystickBase.style.left = touchX + "px";
-      joystickBase.style.top = touchY + "px";
-      joystickBase.style.transform = "translate(-50%, -50%)";
-
-      const baseRect = joystickBase.getBoundingClientRect();
-      joystick.startX = baseRect.left + baseRect.width / 2;
-      joystick.startY = baseRect.top + baseRect.height / 2;
-      
-      try {
-        joystickZone.setPointerCapture(e.pointerId);
-      } catch {
-        // The global pointer-up handler below still resets the joystick.
-      }
-      updateJoystick(joystick.startX, joystick.startY, e.clientX, e.clientY);
+      jsActive = true;
+      jsPid    = e.pointerId;
+      try { joystickZone.setPointerCapture(e.pointerId); } catch (_) {}
+      updateZoneCentre();
+      moveKnob(e.clientX, e.clientY);
     }, { passive: false });
 
     joystickZone.addEventListener("pointermove", (e) => {
-      if (!joystick.active || e.pointerId !== joystick.pointerId) return;
+      if (!jsActive || e.pointerId !== jsPid) return;
       e.preventDefault();
-      updateJoystick(joystick.startX, joystick.startY, e.clientX, e.clientY);
+      e.stopPropagation();
+      moveKnob(e.clientX, e.clientY);
     }, { passive: false });
 
-    function finishJoystick(e) {
-      if (!joystick.active || e.pointerId !== joystick.pointerId) return;
-      resetJoystick();
+    function onUp(e) {
+      if (!jsActive || e.pointerId !== jsPid) return;
+      resetKnob();
+    }
+    joystickZone.addEventListener("pointerup",          onUp);
+    joystickZone.addEventListener("pointercancel",      onUp);
+    joystickZone.addEventListener("lostpointercapture", () => { if (jsActive) resetKnob(); });
+    window.addEventListener("pointerup", onUp);
+
+    // Right-half canvas touch aims the reticle
+    canvas.addEventListener("pointermove", (e) => {
+      if (state.mode !== "playing") return;
+      if (e.clientX > window.innerWidth * 0.42) {
+        state.mouse.x = e.clientX;
+        state.mouse.y = e.clientY;
+      }
+    });
+
+    // ── Button helpers ────────────────────────────────────────────
+    function holdKey(btn, code) {
+      btn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        unlockAudio();
+        state.keys.add(code);
+        btn.classList.add("pressed");
+      }, { passive: false });
+      const up = (e) => { e.stopPropagation(); state.keys.delete(code); btn.classList.remove("pressed"); };
+      btn.addEventListener("pointerup",     up);
+      btn.addEventListener("pointercancel", up);
+      btn.addEventListener("pointerleave",  up);
     }
 
-    joystickZone.addEventListener("pointerup", finishJoystick);
-    joystickZone.addEventListener("pointercancel", finishJoystick);
-    joystickZone.addEventListener("lostpointercapture", () => resetJoystick());
-    window.addEventListener("pointerup", finishJoystick);
+    function tapAction(btn, fn) {
+      btn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        unlockAudio();
+        fn();
+        btn.classList.add("pressed");
+        setTimeout(() => btn.classList.remove("pressed"), 160);
+      }, { passive: false });
+    }
 
-    // Fire button (hold = continuous fire)
+    // Fire (hold)
     btnFire.addEventListener("pointerdown", (e) => {
       e.preventDefault();
+      e.stopPropagation();
       unlockAudio();
       state.mouse.down = true;
       btnFire.classList.add("pressed");
     }, { passive: false });
-    btnFire.addEventListener("pointerup", () => {
-      state.mouse.down = false;
-      btnFire.classList.remove("pressed");
-    });
-    btnFire.addEventListener("pointercancel", () => {
-      state.mouse.down = false;
-      btnFire.classList.remove("pressed");
-    });
+    const fireUp = (e) => { e.stopPropagation(); state.mouse.down = false; btnFire.classList.remove("pressed"); };
+    btnFire.addEventListener("pointerup",     fireUp);
+    btnFire.addEventListener("pointercancel", fireUp);
+    btnFire.addEventListener("pointerleave",  fireUp);
 
-    // Dash (Space)
-    btnDash.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      state.keys.add("Space");
-      btnDash.classList.add("pressed");
-    }, { passive: false });
-    btnDash.addEventListener("pointerup", () => {
-      state.keys.delete("Space");
-      btnDash.classList.remove("pressed");
-    });
-    btnDash.addEventListener("pointercancel", () => {
-      state.keys.delete("Space");
-      btnDash.classList.remove("pressed");
-    });
+    holdKey(btnDash,   "Space");
+    holdKey(btnPulse,  "KeyQ");
+    holdKey(btnAction, "KeyE");
 
-    // Nova Pulse (Q)
-    btnPulse.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      state.keys.add("KeyQ");
-      btnPulse.classList.add("pressed");
-    }, { passive: false });
-    btnPulse.addEventListener("pointerup", () => {
-      state.keys.delete("KeyQ");
-      btnPulse.classList.remove("pressed");
-    });
-    btnPulse.addEventListener("pointercancel", () => {
-      state.keys.delete("KeyQ");
-      btnPulse.classList.remove("pressed");
-    });
+    tapAction(btnMissile, () => { if (state.mode === "playing" && state.mission) launchMissile(state.mission); });
+    tapAction(btnDrone,   () => { if (state.mode === "playing" && state.mission) deployDrone(state.mission); });
 
-    // Missile (F)
-    btnMissile.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      if (state.mode === "playing" && state.mission) launchMissile(state.mission);
-      btnMissile.classList.add("pressed");
-      setTimeout(() => btnMissile.classList.remove("pressed"), 160);
-    }, { passive: false });
-
-    // Drone (R)
-    btnDrone.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      if (state.mode === "playing" && state.mission) deployDrone(state.mission);
-      btnDrone.classList.add("pressed");
-      setTimeout(() => btnDrone.classList.remove("pressed"), 160);
-    }, { passive: false });
-
-    // Action (E)
-    btnAction.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      state.keys.add("KeyE");
-      btnAction.classList.add("pressed");
-    }, { passive: false });
-    btnAction.addEventListener("pointerup", () => {
-      state.keys.delete("KeyE");
-      btnAction.classList.remove("pressed");
-    });
-    btnAction.addEventListener("pointercancel", () => {
-      state.keys.delete("KeyE");
-      btnAction.classList.remove("pressed");
-    });
-
-    // Mobile pause
     if (mobPause) {
-      mobPause.addEventListener("click", () => {
+      mobPause.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         if (state.mode === "playing" || state.mode === "paused") {
           setMode(state.mode === "paused" ? "playing" : "paused");
           playSfx("click");
         }
-      });
+      }, { passive: false });
     }
   }
 
@@ -3838,11 +4134,14 @@
 
   function startStory() {
     if (!ui.storyScreen) { setMode("command"); return; }
+    // If already seen the intro, skip directly to command deck
+    if (state.save.controlsSeen) { setMode("command"); return; }
     ui.storyText.innerHTML = "";
     storyCharIndex = 0;
     storyLineIndex = 0;
-    ui.skipStoryButton.classList.add("hidden");
-    setTimeout(typewriterTick, 900);
+    // Show skip button immediately — never force the user to wait
+    ui.skipStoryButton.classList.remove("hidden");
+    setTimeout(typewriterTick, 400);
   }
 
   function typewriterTick() {
@@ -3871,6 +4170,7 @@
   }
 
   resize();
+  rebuildPlanets();
   bindEvents();
   renderCommandDeck();
   requestAnimationFrame((now) => {

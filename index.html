@@ -86,7 +86,7 @@
     <main id="commandDeck" class="screen hidden">
       <header class="deck-header">
         <div>
-          <p class="eyebrow">Helios Fleet / Command Deck</p>
+          <p class="eyebrow">Helios Fleet / Command Deck &mdash; <span id="systemLabel">Sol System / The Homeworld Cluster</span></p>
           <h1><span>Solar Liberation</span> <span>Command</span></h1>
         </div>
         <div class="deck-actions">
@@ -206,11 +206,11 @@
         <div class="paint-modal-header">
           <div>
             <p class="eyebrow">Hangar / Customisation</p>
-            <h2>Ship Paint</h2>
+            <h2>Ship Paint &amp; Frame</h2>
           </div>
-          <button id="closePaintButton" class="ghost-button" type="button">✕ Close</button>
+          <button id="closePaintButton" class="ghost-button pixel-button" type="button">✕ CLOSE</button>
         </div>
-        <p class="brief">Select a hull colour scheme for your vessel.</p>
+        <p class="brief">Choose your hull colour and ship frame below.</p>
         <div id="paintSwatchGrid" class="paint-swatch-grid"></div>
         <div class="modal-actions">
           <button id="confirmPaintButton" class="primary-button" type="button">Confirm Paint</button>
@@ -234,27 +234,27 @@
       </div>
     </div>
 
-    <!-- Mobile touch controls -->
+    <!-- Mobile touch controls (shown only on touch devices during play) -->
     <div id="mobileControls" class="mobile-controls hidden" aria-hidden="true">
-      <!-- Left joystick zone -->
-      <div id="joystickZone" class="joystick-zone" aria-label="Movement joystick">
+      <!-- Left: virtual joystick -->
+      <div id="joystickZone" class="joystick-zone">
         <div id="joystickBase" class="joystick-base">
           <div id="joystickKnob" class="joystick-knob"></div>
         </div>
       </div>
 
-      <!-- Right side action buttons -->
+      <!-- Right: action pad -->
       <div class="action-buttons">
-        <button id="btnFire" class="mob-btn mob-btn-fire" type="button" aria-label="Fire">🔥</button>
-        <button id="btnDash" class="mob-btn mob-btn-dash" type="button" aria-label="Dash">⚡</button>
-        <button id="btnPulse" class="mob-btn mob-btn-pulse" type="button" aria-label="Nova Pulse">💥</button>
-        <button id="btnMissile" class="mob-btn mob-btn-missile" type="button" aria-label="Missile">🚀</button>
-        <button id="btnDrone" class="mob-btn mob-btn-drone" type="button" aria-label="Drone">🤖</button>
-        <button id="btnAction" class="mob-btn mob-btn-action" type="button" aria-label="Action (E)">⚙️</button>
+        <button id="btnDash"    class="mob-btn mob-btn-dash"    type="button" aria-label="Dash">DASH</button>
+        <button id="btnFire"    class="mob-btn mob-btn-fire"    type="button" aria-label="Fire">FIRE</button>
+        <button id="btnPulse"   class="mob-btn mob-btn-pulse"   type="button" aria-label="Pulse">PULSE</button>
+        <button id="btnMissile" class="mob-btn mob-btn-missile" type="button" aria-label="Missile">MSL</button>
+        <button id="btnDrone"   class="mob-btn mob-btn-drone"   type="button" aria-label="Drone">DRON</button>
+        <button id="btnAction"  class="mob-btn mob-btn-action"  type="button" aria-label="Action">ACT</button>
       </div>
 
-      <!-- Top-right pause button for mobile -->
-      <button id="mobPause" class="mob-pause-btn" type="button" aria-label="Pause">❚❚</button>
+      <!-- Pause shortcut top-right -->
+      <button id="mobPause" class="mob-pause-btn" type="button" aria-label="Pause">PAUSE</button>
     </div>
     <!-- Portrait Rotate Overlay -->
     <div id="rotateOverlay" class="rotate-overlay hidden" aria-hidden="true">
