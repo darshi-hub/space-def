@@ -29,7 +29,9 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100vh;   /* fallback */
+  height: 100dvh;  /* real visible viewport height on mobile browsers */
   margin: 0;
   overflow: hidden;
   background:
@@ -38,6 +40,21 @@ html, body {
     linear-gradient(135deg, #02040a 0%, #07101d 42%, #090816 100%);
   color: var(--text);
   overscroll-behavior: none;
+  /* Disable zoom gestures site-wide (pinch-zoom, double-tap-zoom) */
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Belt-and-braces: block pinch-zoom and double-tap-zoom on every element,
+   in addition to the viewport meta tag (some browsers ignore
+   user-scalable=no on the meta tag alone, especially with accessibility
+   zoom settings enabled at the OS level — this CSS layer catches those). */
+* {
+  touch-action: manipulation;
+}
+html, body, #gameCanvas, .mobile-controls, .joystick-zone, .action-buttons, .mob-btn, .mob-pause-btn {
+  touch-action: none;
 }
 
 button {
@@ -54,7 +71,9 @@ button:disabled { cursor: not-allowed; opacity: 0.42; }
 #gameCanvas {
   position: fixed;
   inset: 0;
-  width: 100vw; height: 100vh;
+  width: 100vw;
+  height: 100vh;   /* fallback */
+  height: 100dvh;  /* real visible viewport on mobile browsers */
   display: block;
   background: #03050b;
   touch-action: none;
@@ -162,7 +181,8 @@ button:disabled { cursor: not-allowed; opacity: 0.42; }
 #commandDeck {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh;   /* fallback for older browsers */
+  height: 100dvh;  /* real visible viewport on iOS/Android — accounts for the address bar */
   padding: clamp(12px, 2vw, 28px);
   overflow: hidden;
 }
@@ -1024,11 +1044,13 @@ kbd {
   -webkit-touch-callout: none;
 }
 
-/* Joystick zone — left side, fixed size circle */
+/* Joystick zone — left side, fixed size circle. Sized generously and
+   anchored to the bottom-left so a thumb resting naturally on the
+   lower-left of the screen lands on it without stretching. */
 .joystick-zone {
   position: relative;
   flex: 0 0 auto;
-  width: 156px; height: 156px;
+  width: 168px; height: 168px;
   border-radius: 50%;
   border: 1px solid rgba(53,216,255,0.28);
   background: rgba(5,10,18,0.55);
@@ -1043,7 +1065,7 @@ kbd {
 /* Base ring — purely decorative, never moved by JS */
 .joystick-base {
   position: absolute;
-  width: 104px; height: 104px;
+  width: 112px; height: 112px;
   left: 50%; top: 50%;
   transform: translate(-50%,-50%);
   border-radius: 50%;
@@ -1054,7 +1076,7 @@ kbd {
 /* Knob — centred in zone, JS only changes transform offset */
 .joystick-knob {
   position: absolute;
-  width: 42px; height: 42px;
+  width: 46px; height: 46px;
   left: 50%; top: 50%;
   transform: translate(-50%, -50%);
   border-radius: 0;
@@ -1064,26 +1086,38 @@ kbd {
   will-change: transform;
 }
 
-/* Action buttons — right side, 3×2 grid */
+/* ── Action pad ──────────────────────────────────────────────────────
+   Arranged in a thumb-reach arc around a large, central FIRE button —
+   the most-used action sits dead-centre where the thumb naturally
+   rests, with the four secondary abilities placed at the compass
+   points around it (up/down/left/right) rather than in a plain grid.
+   This keeps every button reachable by rolling the thumb outward from
+   FIRE without lifting it off the glass, and prevents accidental
+   presses between adjacent buttons by spacing them further apart than
+   a tight 3×2 grid would allow. ACT (objective/interact) sits below
+   FIRE since it's held less urgently than combat actions. */
 .action-buttons {
+  position: relative;
   flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 50px);
-  grid-template-rows:    repeat(2, 50px);
-  gap: 8px;
+  width: 236px;
+  height: 236px;
   pointer-events: auto;
   touch-action: none;
 }
 
-/* All mobile buttons — square, pixel-art */
+/* All mobile buttons — square, pixel-art, positioned absolutely within
+   the action-buttons arc container so each sits at a fixed compass
+   point regardless of viewport size (scaled down at small breakpoints
+   via the container's own width/height, see media queries below). */
 .mob-btn {
+  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px; height: 50px;
+  width: 58px; height: 58px;
   border-radius: 0;
   border: 2px solid rgba(53,216,255,0.4);
-  background: rgba(5,10,18,0.82);
+  background: rgba(5,10,18,0.85);
   color: var(--text);
   font-family: 'Press Start 2P', monospace;
   font-size: 6px;
@@ -1098,24 +1132,67 @@ kbd {
 }
 .mob-btn:active,
 .mob-btn.pressed {
-  background: rgba(53,216,255,0.18);
+  background: rgba(53,216,255,0.2);
   box-shadow: 1px 1px 0 rgba(0,0,0,0.45);
   transform: translate(2px,2px);
 }
 
-/* Individual button accent colours */
+/* FIRE — largest button, dead centre of the arc (thumb's natural rest
+   position), highest z-index so it's always the easiest hit target. */
 .mob-btn-fire {
+  width: 74px; height: 74px;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
   border-color: var(--red);
   color: var(--red);
-  box-shadow: 3px 3px 0 rgba(0,0,0,0.45), 0 0 10px rgba(255,92,122,0.2);
-  grid-column: 2; grid-row: 1;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.45), 0 0 14px rgba(255,92,122,0.28);
+  font-size: 8px;
+  z-index: 3;
 }
-.mob-btn-fire.pressed { background: rgba(255,92,122,0.2); }
-.mob-btn-dash    { border-color: var(--cyan);   color: var(--cyan);   }
-.mob-btn-pulse   { border-color: var(--violet); color: var(--violet); }
-.mob-btn-missile { border-color: var(--amber);  color: var(--amber);  }
-.mob-btn-drone   { border-color: var(--green);  color: var(--green);  }
-.mob-btn-action  { border-color: var(--green);  color: var(--green);  }
+.mob-btn-fire:active,
+.mob-btn-fire.pressed {
+  background: rgba(255,92,122,0.22);
+  box-shadow: 1px 1px 0 rgba(0,0,0,0.45);
+  transform: translate(calc(-50% + 2px), calc(-50% + 2px));
+}
+
+/* DASH — upper-left of the arc (quick reflex dodge, thumb rolls up-left) */
+.mob-btn-dash {
+  left: 6%; top: 6%;
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+/* PULSE — upper-right of the arc */
+.mob-btn-pulse {
+  right: 6%; left: auto; top: 6%;
+  border-color: var(--violet);
+  color: var(--violet);
+}
+
+/* MISSILE — top-centre, above FIRE */
+.mob-btn-missile {
+  left: 50%; top: 0;
+  transform: translateX(-50%);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* DRONE — lower-left of the arc */
+.mob-btn-drone {
+  left: 6%; bottom: 6%; top: auto;
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* ACT (objective/interact) — bottom-centre, below FIRE, since it's
+   held deliberately rather than tapped in a hurry like combat actions */
+.mob-btn-action {
+  left: 50%; bottom: 0; top: auto;
+  transform: translateX(-50%);
+  border-color: var(--green);
+  color: var(--green);
+}
 
 /* Pause shortcut — absolutely positioned top-right */
 .mob-pause-btn {
@@ -1194,9 +1271,9 @@ kbd {
   .ability-dock { display: none; }
   #miniMap {
     width: 110px; height: 110px;
-    bottom: 180px; /* sit above the action-button area */
+    bottom: 200px; /* sit above the taller action-button arc */
   }
-  .warning { bottom: 178px; font-size: 7px; }
+  .warning { bottom: 198px; font-size: 7px; }
 }
 
 /* ── Laptop / large tablet (≤ 1180px) ───────────────────────────── */
@@ -1311,26 +1388,33 @@ kbd {
 @media (max-width: 420px) {
   .deck-header h1 { font-size: clamp(9px,3vw,12px); }
   .planet-name { font-size: 6px; }
-  .joystick-zone { width: 136px; height: 136px; }
-  /* knob stays centred via left:50%/top:50%/transform — zone size change alone shrinks it */
-  .action-buttons { grid-template-columns: repeat(3,44px); grid-template-rows: repeat(2,44px); gap: 6px; }
-  .mob-btn { width: 44px; height: 44px; }
-  .mob-btn-fire { width: 44px; height: 44px; }
+  .joystick-zone { width: 144px; height: 144px; }
+  .joystick-base { width: 96px; height: 96px; }
+  .joystick-knob { width: 40px; height: 40px; }
+
+  .action-buttons { width: 196px; height: 196px; }
+  .mob-btn { width: 48px; height: 48px; }
+  .mob-btn-fire { width: 62px; height: 62px; }
+
   .paint-color-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
 
-/* ── Touch landscape: compact HUD ───────────────────────────────── */
+/* ── Touch landscape: compact HUD (short screens, e.g. phones rotated) ── */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
   .mobile-controls { padding: 4px max(6px,env(safe-area-inset-right)) 4px max(6px,env(safe-area-inset-left)); }
-  .joystick-zone { width: 126px; height: 126px; }
-  /* knob stays centred via left:50%/top:50%/transform — zone size change alone shrinks it */
-  .action-buttons { grid-template-columns: repeat(3,42px); grid-template-rows: repeat(2,42px); gap: 5px; }
-  .mob-btn { width: 42px; height: 42px; }
-  .mob-btn-fire { width: 42px; height: 42px; }
+
+  .joystick-zone { width: 132px; height: 132px; }
+  .joystick-base { width: 88px; height: 88px; }
+  .joystick-knob { width: 36px; height: 36px; }
+
+  .action-buttons { width: 188px; height: 188px; }
+  .mob-btn { width: 46px; height: 46px; }
+  .mob-btn-fire { width: 58px; height: 58px; }
+
   .mission-card, .hud-right { display: none; }
   .hud-top { grid-template-columns: 1fr; }
   .status-bank { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 3px; padding: 3px; }
   .meter { min-height: 30px; padding: 4px; }
-  #miniMap { width: 80px; height: 80px; bottom: 140px; }
-  .warning { bottom: 138px; font-size: 6px; }
+  #miniMap { width: 80px; height: 80px; bottom: 156px; }
+  .warning { bottom: 154px; font-size: 6px; }
 }
