@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Solar Liberation Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
@@ -243,13 +243,15 @@
         </div>
       </div>
 
-      <!-- Right: action pad -->
+      <!-- Right: action pad, arranged around a central FIRE button
+           in a thumb-reach arc so every button is reachable without
+           the thumb crossing over the others. -->
       <div class="action-buttons">
-        <button id="btnDash"    class="mob-btn mob-btn-dash"    type="button" aria-label="Dash">DASH</button>
-        <button id="btnFire"    class="mob-btn mob-btn-fire"    type="button" aria-label="Fire">FIRE</button>
-        <button id="btnPulse"   class="mob-btn mob-btn-pulse"   type="button" aria-label="Pulse">PULSE</button>
         <button id="btnMissile" class="mob-btn mob-btn-missile" type="button" aria-label="Missile">MSL</button>
+        <button id="btnPulse"   class="mob-btn mob-btn-pulse"   type="button" aria-label="Pulse">PULSE</button>
         <button id="btnDrone"   class="mob-btn mob-btn-drone"   type="button" aria-label="Drone">DRON</button>
+        <button id="btnFire"    class="mob-btn mob-btn-fire"    type="button" aria-label="Fire">FIRE</button>
+        <button id="btnDash"    class="mob-btn mob-btn-dash"    type="button" aria-label="Dash">DASH</button>
         <button id="btnAction"  class="mob-btn mob-btn-action"  type="button" aria-label="Action">ACT</button>
       </div>
 
