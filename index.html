@@ -51,6 +51,13 @@
           <div><span>Time</span><strong id="hudTime">00:00</strong></div>
           <div><span>Combo</span><strong id="hudCombo">x1.0</strong></div>
         </div>
+        <!-- On touch devices this canvas relocates into the HUD top row
+             itself (see .hud-top canvas#miniMap in styles.css) so it
+             always sits in normal document flow next to Salvage/Time/
+             Combo — never guessing a pixel offset to clear the
+             bottom-right action-button arc, which used to overlap it
+             on wider/shorter viewports (iPad landscape, phone landscape). -->
+        <canvas id="miniMap" width="180" height="180" aria-hidden="true"></canvas>
       </div>
       <div id="abilityDock" class="ability-dock">
         <div class="ability-pill">
@@ -79,7 +86,6 @@
           <i id="speedBar"></i>
         </div>
       </div>
-      <canvas id="miniMap" width="180" height="180" aria-hidden="true"></canvas>
       <div id="warning" class="warning"></div>
     </div>
 
