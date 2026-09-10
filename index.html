@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Solar Liberation Command</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
@@ -51,13 +51,6 @@
           <div><span>Time</span><strong id="hudTime">00:00</strong></div>
           <div><span>Combo</span><strong id="hudCombo">x1.0</strong></div>
         </div>
-        <!-- On touch devices this canvas relocates into the HUD top row
-             itself (see .hud-top canvas#miniMap in styles.css) so it
-             always sits in normal document flow next to Salvage/Time/
-             Combo — never guessing a pixel offset to clear the
-             bottom-right action-button arc, which used to overlap it
-             on wider/shorter viewports (iPad landscape, phone landscape). -->
-        <canvas id="miniMap" width="180" height="180" aria-hidden="true"></canvas>
       </div>
       <div id="abilityDock" class="ability-dock">
         <div class="ability-pill">
@@ -86,6 +79,7 @@
           <i id="speedBar"></i>
         </div>
       </div>
+      <canvas id="miniMap" width="180" height="180" aria-hidden="true"></canvas>
       <div id="warning" class="warning"></div>
     </div>
 
@@ -249,15 +243,13 @@
         </div>
       </div>
 
-      <!-- Right: action pad, arranged around a central FIRE button
-           in a thumb-reach arc so every button is reachable without
-           the thumb crossing over the others. -->
+      <!-- Right: action pad -->
       <div class="action-buttons">
-        <button id="btnMissile" class="mob-btn mob-btn-missile" type="button" aria-label="Missile">MSL</button>
-        <button id="btnPulse"   class="mob-btn mob-btn-pulse"   type="button" aria-label="Pulse">PULSE</button>
-        <button id="btnDrone"   class="mob-btn mob-btn-drone"   type="button" aria-label="Drone">DRON</button>
-        <button id="btnFire"    class="mob-btn mob-btn-fire"    type="button" aria-label="Fire">FIRE</button>
         <button id="btnDash"    class="mob-btn mob-btn-dash"    type="button" aria-label="Dash">DASH</button>
+        <button id="btnFire"    class="mob-btn mob-btn-fire"    type="button" aria-label="Fire">FIRE</button>
+        <button id="btnPulse"   class="mob-btn mob-btn-pulse"   type="button" aria-label="Pulse">PULSE</button>
+        <button id="btnMissile" class="mob-btn mob-btn-missile" type="button" aria-label="Missile">MSL</button>
+        <button id="btnDrone"   class="mob-btn mob-btn-drone"   type="button" aria-label="Drone">DRON</button>
         <button id="btnAction"  class="mob-btn mob-btn-action"  type="button" aria-label="Action">ACT</button>
       </div>
 
