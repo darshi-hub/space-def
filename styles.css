@@ -698,14 +698,20 @@ button:disabled { cursor: not-allowed; opacity: 0.42; }
   transform-origin: left center;
 }
 
-/* Mini map */
+/* Mini map — fixed (not absolute) so it always anchors to the real
+   viewport corner regardless of which element it's nested inside in
+   the DOM (it moves into .hud-top's markup on touch devices — see the
+   (pointer:coarse) override below — and .hud-top is itself
+   position:absolute, which would otherwise hijack it as the
+   containing block and break the corner anchor). */
 #miniMap {
-  position: absolute;
+  position: fixed;
   right:  max(12px, env(safe-area-inset-right));
   bottom: max(12px, env(safe-area-inset-bottom));
   width: 160px;
   height: 160px;
   border-radius: 0;
+  z-index: 3;
 }
 
 /* Warning bar */
@@ -1269,11 +1275,31 @@ kbd {
 /* ── Touch/coarse pointer: HUD adjustments ───────────────────────── */
 @media (pointer: coarse) {
   .ability-dock { display: none; }
-  #miniMap {
-    width: 110px; height: 110px;
-    bottom: 200px; /* sit above the taller action-button arc */
+
+  /* The minimap used to float independently with a hardcoded pixel
+     offset guessing where the bottom-right action-button arc ended —
+     that guess broke on wider/shorter viewports (iPad landscape,
+     phone landscape) and the minimap ended up overlapping the action
+     buttons. Instead, on touch devices the minimap becomes a real
+     grid item inside .hud-top (see the matching HTML change — the
+     canvas now lives inside .hud-top, not as a floating sibling), so
+     it always sits in normal document flow next to Salvage/Time/Combo
+     and never has to guess anyone else's height. */
+  .hud-top {
+    grid-template-columns: minmax(150px,0.7fr) minmax(280px,1.3fr) minmax(140px,0.45fr) auto;
   }
-  .warning { bottom: 198px; font-size: 7px; }
+  .hud-top canvas#miniMap {
+    position: static;
+    width: 84px;
+    height: 84px;
+    border: 1px solid var(--line);
+    background: rgba(5,10,18,0.78);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+    justify-self: end;
+  }
+
+  .warning { bottom: max(148px, calc(env(safe-area-inset-bottom) + 148px)); font-size: 7px; }
 }
 
 /* ── Laptop / large tablet (≤ 1180px) ───────────────────────────── */
@@ -1367,14 +1393,19 @@ kbd {
   .control-hints { grid-template-columns: repeat(2, 1fr); }
 
   .hud-top {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
     right: auto;
     width: min(440px, calc(100vw - 20px));
   }
-  .status-bank { grid-template-columns: repeat(2,1fr); gap: 5px; padding: 5px; }
+  .status-bank {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2,1fr);
+    gap: 5px;
+    padding: 5px;
+  }
   .meter { min-height: 36px; padding: 5px; }
   .hud-right { display: none; }
-  #miniMap { width: 90px; height: 90px; }
+  .hud-top canvas#miniMap { width: 64px; height: 64px; }
   .warning { font-size: 7px; }
 
   /* Paint modal on small screens */
@@ -1399,22 +1430,48 @@ kbd {
   .paint-color-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
 
-/* ── Touch landscape: compact HUD (short screens, e.g. phones rotated) ── */
+/* ── Touch landscape: compact HUD (short screens, e.g. phones rotated) ──
+   On real phone landscape (typically 360-420px tall), the fixed UI
+   chrome — top HUD bar plus bottom control cluster — can eat most of
+   the vertical space if not shrunk aggressively, leaving very little
+   of the actual game visible in between. These sizes are deliberately
+   smaller than the tablet/iPad sizing above. */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
   .mobile-controls { padding: 4px max(6px,env(safe-area-inset-right)) 4px max(6px,env(safe-area-inset-left)); }
 
-  .joystick-zone { width: 132px; height: 132px; }
-  .joystick-base { width: 88px; height: 88px; }
-  .joystick-knob { width: 36px; height: 36px; }
+  .joystick-zone { width: 108px; height: 108px; }
+  .joystick-base { width: 72px; height: 72px; }
+  .joystick-knob { width: 30px; height: 30px; }
 
-  .action-buttons { width: 188px; height: 188px; }
-  .mob-btn { width: 46px; height: 46px; }
-  .mob-btn-fire { width: 58px; height: 58px; }
+  .action-buttons { width: 152px; height: 152px; }
+  .mob-btn { width: 38px; height: 38px; font-size: 5px; }
+  .mob-btn-fire { width: 48px; height: 48px; font-size: 7px; }
 
   .mission-card, .hud-right { display: none; }
-  .hud-top { grid-template-columns: 1fr; }
-  .status-bank { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 3px; padding: 3px; }
-  .meter { min-height: 30px; padding: 4px; }
-  #miniMap { width: 80px; height: 80px; bottom: 156px; }
-  .warning { bottom: 154px; font-size: 6px; }
+  .hud-top { grid-template-columns: 1fr auto; }
+  .status-bank {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 3px;
+    padding: 3px;
+  }
+  .meter { min-height: 26px; padding: 3px; }
+  .hud-top canvas#miniMap { width: 56px; height: 56px; }
+  .warning { bottom: max(110px, calc(env(safe-area-inset-bottom) + 110px)); font-size: 6px; }
+}
+
+/* ── Touch landscape: extremely short screens (small phones) ──────── */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 400px) {
+  .joystick-zone { width: 92px; height: 92px; }
+  .joystick-base { width: 62px; height: 62px; }
+  .joystick-knob { width: 26px; height: 26px; }
+
+  .action-buttons { width: 128px; height: 128px; }
+  .mob-btn { width: 32px; height: 32px; font-size: 4px; }
+  .mob-btn-fire { width: 40px; height: 40px; font-size: 6px; }
+
+  .hud-top canvas#miniMap { width: 44px; height: 44px; }
+  .status-bank { gap: 2px; padding: 2px; }
+  .meter { min-height: 22px; padding: 2px; }
+  .warning { bottom: max(92px, calc(env(safe-area-inset-bottom) + 92px)); font-size: 5px; }
 }
