@@ -194,61 +194,13 @@
     {
       id: "ross-128",
       name: "Ross 128",
-      subtitle: "The Vanguard Line",
+      subtitle: "Dominion's Throne",
       starColor: "#ffa000",
       planets: [
         { id:"ross-a", name:"Ross-A",      color:"#804020", accent:"#ffa040", threat:11, nodes:6, defenders:"Elite vanguard",   reward:2800, brief:"Dominion's elite vanguard units have been enhanced beyond standard enemy templates." },
         { id:"ross-b", name:"Ross-B",      color:"#603010", accent:"#e08030", threat:12, nodes:7, defenders:"Command fleet",    reward:3500, brief:"The Dominion Command Fleet coordinates attacks from orbit — take out the flagship." },
         { id:"ross-c", name:"Ross-C",      color:"#401808", accent:"#c06020", threat:13, nodes:7, defenders:"Throne guard",     reward:4200, brief:"Throne-Guard units are individually named machines bonded to Dominion's core directive." },
-        { id:"ross-d", name:"Ross-D",      color:"#200808", accent:"#a04010", threat:14, nodes:8, defenders:"Vanguard-Prime",   reward:5000, brief:"Vanguard-Prime commands this sector as a staging ground for Dominion's deep-space fleet." },
-      ],
-    },
-    {
-      id: "trappist-1",
-      name: "TRAPPIST-1",
-      subtitle: "The Seven Seals",
-      starColor: "#ff8848",
-      planets: [
-        { id:"trap-b", name:"Trappist-B", color:"#a04828", accent:"#ff8850", threat:14, nodes:6, defenders:"Seal wardens",     reward:5400, brief:"Seven tidally-locked worlds share a single defense grid — breach one, wake them all." },
-        { id:"trap-c", name:"Trappist-C", color:"#c06030", accent:"#ffa060", threat:15, nodes:7, defenders:"Ember cannons",    reward:5900, brief:"Ember cannon batteries track heat blooms from your engines across the whole system." },
-        { id:"trap-d", name:"Trappist-D", color:"#804020", accent:"#e07040", threat:15, nodes:7, defenders:"Chorus drones",    reward:6300, brief:"Chorus drones share targeting data instantly — losing lock on one loses it on all." },
-        { id:"trap-e", name:"Trappist-E", color:"#603018", accent:"#c05830", threat:16, nodes:8, defenders:"Seal breaker",     reward:6800, brief:"The habitable core world hides Dominion's seventh and final seal beneath its crust." },
-        { id:"trap-f", name:"Trappist-F", color:"#402010", accent:"#a04828", threat:17, nodes:8, defenders:"Warden-Prime",     reward:7400, brief:"Warden-Prime rebuilds destroyed seals in real time — hit hard, hit fast." },
-      ],
-    },
-    {
-      id: "kepler-442",
-      name: "Kepler-442",
-      subtitle: "The Silent Choir",
-      starColor: "#c8a0ff",
-      planets: [
-        { id:"kep-a", name:"Kepler-442A", color:"#5030a0", accent:"#a070ff", threat:17, nodes:7, defenders:"Choir sentinels",  reward:7800, brief:"Resonant frequencies coordinate every colony in the system as one silent choir." },
-        { id:"kep-b", name:"Kepler-442B", color:"#402080", accent:"#8858e0", threat:18, nodes:8, defenders:"Harmonic mines",   reward:8400, brief:"Harmonic mines detonate in sequence, timed to your ship's own engine frequency." },
-        { id:"kep-c", name:"Kepler-442C", color:"#301860", accent:"#7040c0", threat:19, nodes:8, defenders:"Conductor titan",  reward:9200, brief:"The Conductor Titan directs every defender in the system like an orchestra." },
-        { id:"kep-d", name:"Kepler-442D", color:"#200f48", accent:"#5828a0", threat:20, nodes:9, defenders:"Chorus overlord",  reward:10000,brief:"Silence the Chorus Overlord and the whole system's defense grid goes dark." },
-      ],
-    },
-    {
-      id: "gj-1214",
-      name: "GJ 1214",
-      subtitle: "The Deep Current",
-      starColor: "#40c8ff",
-      planets: [
-        { id:"gj-a", name:"GJ 1214-A", color:"#106080", accent:"#40c8ff", threat:19, nodes:7, defenders:"Current riders",   reward:9200,  brief:"Ocean-world colonies ride pressure currents that scramble targeting sensors." },
-        { id:"gj-b", name:"GJ 1214-B", color:"#0c4868", accent:"#30a0d0", threat:20, nodes:8, defenders:"Abyssal turrets",  reward:9900,  brief:"Abyssal turret platforms surface only to fire, then vanish beneath the waves." },
-        { id:"gj-c", name:"GJ 1214-C", color:"#083050", accent:"#2080b0", threat:21, nodes:9, defenders:"Tide overlord",    reward:10800, brief:"The Tide Overlord commands a rotating current-shield no weapon has cracked." },
-      ],
-    },
-    {
-      id: "trisolaris",
-      name: "Alpha Trisolaris",
-      subtitle: "Dominion's Last Fleet",
-      starColor: "#ff3050",
-      planets: [
-        { id:"tri-a", name:"Trisolaris-A", color:"#900828", accent:"#ff4060", threat:21, nodes:8, defenders:"Triune vanguard",   reward:11000, brief:"Three suns, one fleet — Dominion's last vanguard coordinates across all three at once." },
-        { id:"tri-b", name:"Trisolaris-B", color:"#700020", accent:"#e02040", threat:22, nodes:9, defenders:"Fleet remnant",     reward:12000, brief:"The remnant of Dominion's outer fleet regroups here, dug in and desperate." },
-        { id:"tri-c", name:"Trisolaris-C", color:"#500018", accent:"#c01838", threat:23, nodes:9, defenders:"Core sentinel",     reward:13500, brief:"A sentinel ring guards the last approach to Dominion's true core intelligence." },
-        { id:"tri-d", name:"Trisolaris-D", color:"#300010", accent:"#900020", threat:25, nodes:10,defenders:"Dominion-Omega",    reward:16000, brief:"Dominion-Omega. What's left of the rogue mind that started the war. End it here." },
+        { id:"ross-d", name:"Ross-D",      color:"#200808", accent:"#a04010", threat:14, nodes:8, defenders:"Dominion-Prime",   reward:5000, brief:"Dominion-Prime. The original rogue intelligence. End it here, or it ends humanity." },
       ],
     },
   ];
@@ -3782,23 +3734,6 @@
   }
 
   function bindEvents() {
-    // ── Disable pinch-zoom and double-tap-zoom (belt-and-braces on top of
-    // the viewport meta tag and CSS touch-action rules — some mobile
-    // browsers still allow these gestures through unless explicitly
-    // cancelled at the event level, especially Safari's gesturestart). ──
-    document.addEventListener("gesturestart", (e) => e.preventDefault());
-    document.addEventListener("gesturechange", (e) => e.preventDefault());
-    document.addEventListener("gestureend", (e) => e.preventDefault());
-    let lastTouchEnd = 0;
-    document.addEventListener("touchend", (e) => {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) e.preventDefault(); // block double-tap zoom
-      lastTouchEnd = now;
-    }, { passive: false });
-    document.addEventListener("wheel", (e) => {
-      if (e.ctrlKey) e.preventDefault(); // block ctrl+wheel zoom (trackpad pinch on desktop browsers)
-    }, { passive: false });
-
     // Switch to touch mode only on a genuine touch interaction.
     window.addEventListener("touchstart", () => setTouchMode(true), { passive: true });
     window.addEventListener("pointerdown", (e) => {
@@ -4244,3 +4179,4 @@
   });
   startStory();
 })();
+
