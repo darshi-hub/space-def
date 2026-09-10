@@ -29,9 +29,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html, body {
-  width: 100%;
-  height: 100vh;   /* fallback */
-  height: 100dvh;  /* real visible viewport height on mobile browsers */
+  width: 100%; height: 100%;
   margin: 0;
   overflow: hidden;
   background:
@@ -40,21 +38,6 @@ html, body {
     linear-gradient(135deg, #02040a 0%, #07101d 42%, #090816 100%);
   color: var(--text);
   overscroll-behavior: none;
-  /* Disable zoom gestures site-wide (pinch-zoom, double-tap-zoom) */
-  touch-action: pan-x pan-y;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-}
-
-/* Belt-and-braces: block pinch-zoom and double-tap-zoom on every element,
-   in addition to the viewport meta tag (some browsers ignore
-   user-scalable=no on the meta tag alone, especially with accessibility
-   zoom settings enabled at the OS level — this CSS layer catches those). */
-* {
-  touch-action: manipulation;
-}
-html, body, #gameCanvas, .mobile-controls, .joystick-zone, .action-buttons, .mob-btn, .mob-pause-btn {
-  touch-action: none;
 }
 
 button {
@@ -71,9 +54,7 @@ button:disabled { cursor: not-allowed; opacity: 0.42; }
 #gameCanvas {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;   /* fallback */
-  height: 100dvh;  /* real visible viewport on mobile browsers */
+  width: 100vw; height: 100vh;
   display: block;
   background: #03050b;
   touch-action: none;
@@ -181,8 +162,7 @@ button:disabled { cursor: not-allowed; opacity: 0.42; }
 #commandDeck {
   display: flex;
   flex-direction: column;
-  height: 100vh;   /* fallback for older browsers */
-  height: 100dvh;  /* real visible viewport on iOS/Android — accounts for the address bar */
+  height: 100vh;
   padding: clamp(12px, 2vw, 28px);
   overflow: hidden;
 }
@@ -698,20 +678,14 @@ button:disabled { cursor: not-allowed; opacity: 0.42; }
   transform-origin: left center;
 }
 
-/* Mini map — fixed (not absolute) so it always anchors to the real
-   viewport corner regardless of which element it's nested inside in
-   the DOM (it moves into .hud-top's markup on touch devices — see the
-   (pointer:coarse) override below — and .hud-top is itself
-   position:absolute, which would otherwise hijack it as the
-   containing block and break the corner anchor). */
+/* Mini map */
 #miniMap {
-  position: fixed;
+  position: absolute;
   right:  max(12px, env(safe-area-inset-right));
   bottom: max(12px, env(safe-area-inset-bottom));
   width: 160px;
   height: 160px;
   border-radius: 0;
-  z-index: 3;
 }
 
 /* Warning bar */
@@ -1050,13 +1024,11 @@ kbd {
   -webkit-touch-callout: none;
 }
 
-/* Joystick zone — left side, fixed size circle. Sized generously and
-   anchored to the bottom-left so a thumb resting naturally on the
-   lower-left of the screen lands on it without stretching. */
+/* Joystick zone — left side, fixed size circle */
 .joystick-zone {
   position: relative;
   flex: 0 0 auto;
-  width: 168px; height: 168px;
+  width: 156px; height: 156px;
   border-radius: 50%;
   border: 1px solid rgba(53,216,255,0.28);
   background: rgba(5,10,18,0.55);
@@ -1071,7 +1043,7 @@ kbd {
 /* Base ring — purely decorative, never moved by JS */
 .joystick-base {
   position: absolute;
-  width: 112px; height: 112px;
+  width: 104px; height: 104px;
   left: 50%; top: 50%;
   transform: translate(-50%,-50%);
   border-radius: 50%;
@@ -1082,7 +1054,7 @@ kbd {
 /* Knob — centred in zone, JS only changes transform offset */
 .joystick-knob {
   position: absolute;
-  width: 46px; height: 46px;
+  width: 42px; height: 42px;
   left: 50%; top: 50%;
   transform: translate(-50%, -50%);
   border-radius: 0;
@@ -1092,38 +1064,26 @@ kbd {
   will-change: transform;
 }
 
-/* ── Action pad ──────────────────────────────────────────────────────
-   Arranged in a thumb-reach arc around a large, central FIRE button —
-   the most-used action sits dead-centre where the thumb naturally
-   rests, with the four secondary abilities placed at the compass
-   points around it (up/down/left/right) rather than in a plain grid.
-   This keeps every button reachable by rolling the thumb outward from
-   FIRE without lifting it off the glass, and prevents accidental
-   presses between adjacent buttons by spacing them further apart than
-   a tight 3×2 grid would allow. ACT (objective/interact) sits below
-   FIRE since it's held less urgently than combat actions. */
+/* Action buttons — right side, 3×2 grid */
 .action-buttons {
-  position: relative;
   flex: 0 0 auto;
-  width: 236px;
-  height: 236px;
+  display: grid;
+  grid-template-columns: repeat(3, 50px);
+  grid-template-rows:    repeat(2, 50px);
+  gap: 8px;
   pointer-events: auto;
   touch-action: none;
 }
 
-/* All mobile buttons — square, pixel-art, positioned absolutely within
-   the action-buttons arc container so each sits at a fixed compass
-   point regardless of viewport size (scaled down at small breakpoints
-   via the container's own width/height, see media queries below). */
+/* All mobile buttons — square, pixel-art */
 .mob-btn {
-  position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 58px; height: 58px;
+  width: 50px; height: 50px;
   border-radius: 0;
   border: 2px solid rgba(53,216,255,0.4);
-  background: rgba(5,10,18,0.85);
+  background: rgba(5,10,18,0.82);
   color: var(--text);
   font-family: 'Press Start 2P', monospace;
   font-size: 6px;
@@ -1138,67 +1098,24 @@ kbd {
 }
 .mob-btn:active,
 .mob-btn.pressed {
-  background: rgba(53,216,255,0.2);
+  background: rgba(53,216,255,0.18);
   box-shadow: 1px 1px 0 rgba(0,0,0,0.45);
   transform: translate(2px,2px);
 }
 
-/* FIRE — largest button, dead centre of the arc (thumb's natural rest
-   position), highest z-index so it's always the easiest hit target. */
+/* Individual button accent colours */
 .mob-btn-fire {
-  width: 74px; height: 74px;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
   border-color: var(--red);
   color: var(--red);
-  box-shadow: 3px 3px 0 rgba(0,0,0,0.45), 0 0 14px rgba(255,92,122,0.28);
-  font-size: 8px;
-  z-index: 3;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.45), 0 0 10px rgba(255,92,122,0.2);
+  grid-column: 2; grid-row: 1;
 }
-.mob-btn-fire:active,
-.mob-btn-fire.pressed {
-  background: rgba(255,92,122,0.22);
-  box-shadow: 1px 1px 0 rgba(0,0,0,0.45);
-  transform: translate(calc(-50% + 2px), calc(-50% + 2px));
-}
-
-/* DASH — upper-left of the arc (quick reflex dodge, thumb rolls up-left) */
-.mob-btn-dash {
-  left: 6%; top: 6%;
-  border-color: var(--cyan);
-  color: var(--cyan);
-}
-
-/* PULSE — upper-right of the arc */
-.mob-btn-pulse {
-  right: 6%; left: auto; top: 6%;
-  border-color: var(--violet);
-  color: var(--violet);
-}
-
-/* MISSILE — top-centre, above FIRE */
-.mob-btn-missile {
-  left: 50%; top: 0;
-  transform: translateX(-50%);
-  border-color: var(--amber);
-  color: var(--amber);
-}
-
-/* DRONE — lower-left of the arc */
-.mob-btn-drone {
-  left: 6%; bottom: 6%; top: auto;
-  border-color: var(--green);
-  color: var(--green);
-}
-
-/* ACT (objective/interact) — bottom-centre, below FIRE, since it's
-   held deliberately rather than tapped in a hurry like combat actions */
-.mob-btn-action {
-  left: 50%; bottom: 0; top: auto;
-  transform: translateX(-50%);
-  border-color: var(--green);
-  color: var(--green);
-}
+.mob-btn-fire.pressed { background: rgba(255,92,122,0.2); }
+.mob-btn-dash    { border-color: var(--cyan);   color: var(--cyan);   }
+.mob-btn-pulse   { border-color: var(--violet); color: var(--violet); }
+.mob-btn-missile { border-color: var(--amber);  color: var(--amber);  }
+.mob-btn-drone   { border-color: var(--green);  color: var(--green);  }
+.mob-btn-action  { border-color: var(--green);  color: var(--green);  }
 
 /* Pause shortcut — absolutely positioned top-right */
 .mob-pause-btn {
@@ -1275,31 +1192,11 @@ kbd {
 /* ── Touch/coarse pointer: HUD adjustments ───────────────────────── */
 @media (pointer: coarse) {
   .ability-dock { display: none; }
-
-  /* The minimap used to float independently with a hardcoded pixel
-     offset guessing where the bottom-right action-button arc ended —
-     that guess broke on wider/shorter viewports (iPad landscape,
-     phone landscape) and the minimap ended up overlapping the action
-     buttons. Instead, on touch devices the minimap becomes a real
-     grid item inside .hud-top (see the matching HTML change — the
-     canvas now lives inside .hud-top, not as a floating sibling), so
-     it always sits in normal document flow next to Salvage/Time/Combo
-     and never has to guess anyone else's height. */
-  .hud-top {
-    grid-template-columns: minmax(150px,0.7fr) minmax(280px,1.3fr) minmax(140px,0.45fr) auto;
+  #miniMap {
+    width: 110px; height: 110px;
+    bottom: 180px; /* sit above the action-button area */
   }
-  .hud-top canvas#miniMap {
-    position: static;
-    width: 84px;
-    height: 84px;
-    border: 1px solid var(--line);
-    background: rgba(5,10,18,0.78);
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(12px);
-    justify-self: end;
-  }
-
-  .warning { bottom: max(148px, calc(env(safe-area-inset-bottom) + 148px)); font-size: 7px; }
+  .warning { bottom: 178px; font-size: 7px; }
 }
 
 /* ── Laptop / large tablet (≤ 1180px) ───────────────────────────── */
@@ -1393,19 +1290,14 @@ kbd {
   .control-hints { grid-template-columns: repeat(2, 1fr); }
 
   .hud-top {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr;
     right: auto;
     width: min(440px, calc(100vw - 20px));
   }
-  .status-bank {
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(2,1fr);
-    gap: 5px;
-    padding: 5px;
-  }
+  .status-bank { grid-template-columns: repeat(2,1fr); gap: 5px; padding: 5px; }
   .meter { min-height: 36px; padding: 5px; }
   .hud-right { display: none; }
-  .hud-top canvas#miniMap { width: 64px; height: 64px; }
+  #miniMap { width: 90px; height: 90px; }
   .warning { font-size: 7px; }
 
   /* Paint modal on small screens */
@@ -1419,59 +1311,26 @@ kbd {
 @media (max-width: 420px) {
   .deck-header h1 { font-size: clamp(9px,3vw,12px); }
   .planet-name { font-size: 6px; }
-  .joystick-zone { width: 144px; height: 144px; }
-  .joystick-base { width: 96px; height: 96px; }
-  .joystick-knob { width: 40px; height: 40px; }
-
-  .action-buttons { width: 196px; height: 196px; }
-  .mob-btn { width: 48px; height: 48px; }
-  .mob-btn-fire { width: 62px; height: 62px; }
-
+  .joystick-zone { width: 136px; height: 136px; }
+  /* knob stays centred via left:50%/top:50%/transform — zone size change alone shrinks it */
+  .action-buttons { grid-template-columns: repeat(3,44px); grid-template-rows: repeat(2,44px); gap: 6px; }
+  .mob-btn { width: 44px; height: 44px; }
+  .mob-btn-fire { width: 44px; height: 44px; }
   .paint-color-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
 
-/* ── Touch landscape: compact HUD (short screens, e.g. phones rotated) ──
-   On real phone landscape (typically 360-420px tall), the fixed UI
-   chrome — top HUD bar plus bottom control cluster — can eat most of
-   the vertical space if not shrunk aggressively, leaving very little
-   of the actual game visible in between. These sizes are deliberately
-   smaller than the tablet/iPad sizing above. */
+/* ── Touch landscape: compact HUD ───────────────────────────────── */
 @media (pointer: coarse) and (orientation: landscape) and (max-height: 520px) {
   .mobile-controls { padding: 4px max(6px,env(safe-area-inset-right)) 4px max(6px,env(safe-area-inset-left)); }
-
-  .joystick-zone { width: 108px; height: 108px; }
-  .joystick-base { width: 72px; height: 72px; }
-  .joystick-knob { width: 30px; height: 30px; }
-
-  .action-buttons { width: 152px; height: 152px; }
-  .mob-btn { width: 38px; height: 38px; font-size: 5px; }
-  .mob-btn-fire { width: 48px; height: 48px; font-size: 7px; }
-
+  .joystick-zone { width: 126px; height: 126px; }
+  /* knob stays centred via left:50%/top:50%/transform — zone size change alone shrinks it */
+  .action-buttons { grid-template-columns: repeat(3,42px); grid-template-rows: repeat(2,42px); gap: 5px; }
+  .mob-btn { width: 42px; height: 42px; }
+  .mob-btn-fire { width: 42px; height: 42px; }
   .mission-card, .hud-right { display: none; }
-  .hud-top { grid-template-columns: 1fr auto; }
-  .status-bank {
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(4,minmax(0,1fr));
-    gap: 3px;
-    padding: 3px;
-  }
-  .meter { min-height: 26px; padding: 3px; }
-  .hud-top canvas#miniMap { width: 56px; height: 56px; }
-  .warning { bottom: max(110px, calc(env(safe-area-inset-bottom) + 110px)); font-size: 6px; }
-}
-
-/* ── Touch landscape: extremely short screens (small phones) ──────── */
-@media (pointer: coarse) and (orientation: landscape) and (max-height: 400px) {
-  .joystick-zone { width: 92px; height: 92px; }
-  .joystick-base { width: 62px; height: 62px; }
-  .joystick-knob { width: 26px; height: 26px; }
-
-  .action-buttons { width: 128px; height: 128px; }
-  .mob-btn { width: 32px; height: 32px; font-size: 4px; }
-  .mob-btn-fire { width: 40px; height: 40px; font-size: 6px; }
-
-  .hud-top canvas#miniMap { width: 44px; height: 44px; }
-  .status-bank { gap: 2px; padding: 2px; }
-  .meter { min-height: 22px; padding: 2px; }
-  .warning { bottom: max(92px, calc(env(safe-area-inset-bottom) + 92px)); font-size: 5px; }
+  .hud-top { grid-template-columns: 1fr; }
+  .status-bank { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 3px; padding: 3px; }
+  .meter { min-height: 30px; padding: 4px; }
+  #miniMap { width: 80px; height: 80px; bottom: 140px; }
+  .warning { bottom: 138px; font-size: 6px; }
 }
