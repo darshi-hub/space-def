@@ -218,6 +218,54 @@
       </div>
     </section>
 
+    <!-- Security Lockdown Overlay -->
+    <section id="securityLockOverlay" class="screen modal hidden security-modal" aria-hidden="true" role="alertdialog" aria-modal="true" aria-labelledby="securityTitle">
+      <div class="modal-panel security-panel">
+        <div class="security-hazard-stripes"></div>
+        <div class="security-top-badge">
+          <span class="security-dot"></span>
+          <span>HELIOS FLEET DEFENSE &bull; TERMINAL LOCKDOWN</span>
+        </div>
+        <div class="security-hero">
+          <div class="security-icon-glitch">⚠️</div>
+          <div class="security-headings">
+            <p class="eyebrow security-eyebrow">UNAUTHORIZED ACTION INTERCEPTED</p>
+            <h2 id="securityTitle" class="security-title">TERMINAL BLOCKED</h2>
+          </div>
+        </div>
+        <div class="security-content">
+          <div class="security-reason-box">
+            <span class="reason-indicator">&gt;&gt;</span>
+            <p id="securityLockReason" class="security-reason-text">CONTROL KEY DETECTED &mdash; TERMINAL INTERCEPT ENGAGED</p>
+          </div>
+          <p class="security-warning-notice">
+            The game window has been locked. Direct page saving, HTML downloads, source extraction, and asset archiving are strictly prohibited.
+          </p>
+          <div class="security-status-grid">
+            <div class="sec-grid-item">
+              <span class="sec-label">Ctrl Intercept</span>
+              <strong class="sec-status alert-danger">BLOCKED</strong>
+            </div>
+            <div class="sec-grid-item">
+              <span class="sec-label">Page Save (Ctrl+S)</span>
+              <strong class="sec-status alert-danger">FORBIDDEN</strong>
+            </div>
+            <div class="sec-grid-item">
+              <span class="sec-label">Context Menu</span>
+              <strong class="sec-status alert-danger">DISABLED</strong>
+            </div>
+            <div class="sec-grid-item">
+              <span class="sec-label">Media &amp; Canvas</span>
+              <strong class="sec-status alert-safe">PROTECTED</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions security-actions">
+          <button id="securityUnlockButton" class="primary-button security-unlock-btn" type="button">ACKNOWLEDGE &amp; RESUME</button>
+        </div>
+      </div>
+    </section>
+
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="controlsOverlay" class="controls-overlay hidden" aria-hidden="true">
       <p class="eyebrow">Flight Controls <span class="controls-dismiss">[H to close]</span></p>

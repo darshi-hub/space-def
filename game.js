@@ -382,6 +382,7 @@
     audio: null,
     toastTimer: 0,
     warp: null, // galaxy travel state
+    securityLocked: false,
   };
 
   function defaultSave() {
@@ -430,6 +431,10 @@
   }
 
   function saveGame() {
+    if (state.securityLocked) {
+      console.warn("Save blocked by security protocol.");
+      return;
+    }
     localStorage.setItem(SAVE_KEY, JSON.stringify(state.save));
   }
 
@@ -2430,6 +2435,12 @@
 
   function render() {
     ctx.clearRect(0, 0, state.width, state.height);
+    if (state.securityLocked) {
+      ctx.fillStyle = "#020409";
+      ctx.fillRect(0, 0, state.width, state.height);
+      requestAnimationFrame(loop);
+      return;
+    }
     if (state.mode === "story") {
       renderStoryBackdrop();
     } else if (state.mode === "galaxy") {
@@ -3729,11 +3740,198 @@
   function loop(now) {
     const dt = clamp((now - state.last) / 1000, 0, 0.033);
     state.last = now;
-    update(dt);
+    if (!state.securityLocked) {
+      update(dt);
+    }
     render();
   }
 
+  function setupSecurityProtection() {
+    const overlay = document.getElementById("securityLockOverlay");
+    const reasonEl = document.getElementById("securityLockReason");
+    const unlockBtn = document.getElementById("securityUnlockButton");
+
+    let ctrlHeld = false;
+    let preLockAudioPaused = false;
+
+    function blockGameWindow(reasonText) {
+      state.securityLocked = true;
+      state.keys.clear();
+      state.mouse.down = false;
+      document.body.classList.add("window-blocked");
+
+      if (overlay) {
+        overlay.classList.remove("hidden");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+      if (reasonEl && reasonText) {
+        reasonEl.textContent = reasonText;
+      }
+      // Suspend background audio if currently active
+      if (state.bgm && !state.bgm.paused) {
+        preLockAudioPaused = true;
+        try { state.bgm.pause(); } catch (_) {}
+      }
+      // Play alert tone if audio system is ready
+      try {
+        if (state.audio && !state.save.muted) {
+          playSfx("hit");
+        }
+      } catch (_) {}
+    }
+
+    function unblockGameWindow() {
+      if (ctrlHeld) {
+        if (reasonEl) {
+          reasonEl.textContent = "RELEASE CONTROL KEY FIRST TO RESUME SIMULATION";
+        }
+        return;
+      }
+      state.securityLocked = false;
+      document.body.classList.remove("window-blocked");
+      if (overlay) {
+        overlay.classList.add("hidden");
+        overlay.setAttribute("aria-hidden", "true");
+      }
+      if (preLockAudioPaused && state.bgm && !state.save.muted) {
+        state.bgm.play().catch(() => {});
+        preLockAudioPaused = false;
+      }
+    }
+
+    if (unlockBtn) {
+      unlockBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        unblockGameWindow();
+      });
+    }
+
+    // 1. Intercept Ctrl key, Cmd key, and common save / download / export shortcuts
+    window.addEventListener("keydown", (e) => {
+      const isCtrl = e.key === "Control" || e.code === "ControlLeft" || e.code === "ControlRight" || e.ctrlKey || e.metaKey;
+      if (isCtrl) {
+        ctrlHeld = true;
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        const keyLower = (e.key || "").toLowerCase();
+        let reason = "CONTROL KEY DETECTED — TERMINAL BLOCKED & SAVE DISABLED";
+
+        if (keyLower === "s") {
+          reason = "CTRL+S (SAVE PAGE) BLOCKED — DOWNLOADING IS RESTRICTED";
+        } else if (keyLower === "p") {
+          reason = "CTRL+P (PRINT/PDF EXPORT) BLOCKED — EXPORT IS FORBIDDEN";
+        } else if (keyLower === "u") {
+          reason = "CTRL+U (VIEW SOURCE) BLOCKED — SOURCE ACCESS RESTRICTED";
+        } else if (keyLower === "c") {
+          reason = "CTRL+C (CLIPBOARD COPY) BLOCKED — CONTENT IS PROTECTED";
+        } else if (keyLower === "a") {
+          reason = "CTRL+A (SELECT ALL) BLOCKED — SCRAPING IS RESTRICTED";
+        } else if (e.shiftKey && (keyLower === "i" || keyLower === "j" || keyLower === "c")) {
+          reason = "DEVTOOLS INSPECTOR BLOCKED — ACCESS RESTRICTED";
+        }
+
+        blockGameWindow(reason);
+        return;
+      }
+
+      if (e.key === "F12" || e.code === "F12") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        blockGameWindow("F12 DEVTOOLS BLOCKED — ACCESS RESTRICTED");
+        return;
+      }
+
+      // If already security locked, block all other keys except Escape
+      if (state.securityLocked) {
+        if (e.key === "Escape") {
+          unblockGameWindow();
+        }
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+    }, { capture: true, passive: false });
+
+    window.addEventListener("keyup", (e) => {
+      if (e.key === "Control" || e.code === "ControlLeft" || e.code === "ControlRight" || !e.ctrlKey) {
+        ctrlHeld = false;
+      }
+      if (e.key === "Control" || e.code === "ControlLeft" || e.code === "ControlRight" || e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+      }
+    }, { capture: true, passive: false });
+
+    // 2. Protect against Right-Click context menu (Save as, inspect, etc.)
+    window.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      blockGameWindow("RIGHT-CLICK CONTEXT MENU BLOCKED — DOWNLOADS FORBIDDEN");
+    }, { capture: true, passive: false });
+
+    // 3. Protect against dragging canvas/images/assets
+    window.addEventListener("dragstart", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      blockGameWindow("DRAG & DROP ASSET EXTRACTION BLOCKED");
+    }, { capture: true });
+
+    // 4. Protect against text selection and copying
+    window.addEventListener("selectstart", (e) => {
+      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+      e.preventDefault();
+    }, { capture: true });
+
+    window.addEventListener("copy", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      blockGameWindow("CLIPBOARD COPY BLOCKED — CONTENT IS PROTECTED");
+    }, { capture: true });
+
+    window.addEventListener("cut", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    }, { capture: true });
+
+    // 5. Intercept browser print attempts
+    window.addEventListener("beforeprint", (e) => {
+      e.preventDefault();
+      blockGameWindow("PRINT & PDF EXPORT BLOCKED — ARCHIVING RESTRICTED");
+    }, { capture: true });
+
+    // 6. Intercept download links or dynamic anchor clicks
+    document.addEventListener("click", (e) => {
+      const a = e.target && e.target.closest ? e.target.closest("a") : null;
+      if (a && (a.hasAttribute("download") || a.download)) {
+        e.preventDefault();
+        e.stopPropagation();
+        blockGameWindow("FILE DOWNLOAD REQUEST BLOCKED");
+      }
+    }, { capture: true });
+
+    // 7. Protect Canvas against programmatic image extraction (toDataURL / toBlob)
+    try {
+      HTMLCanvasElement.prototype.toDataURL = function() {
+        blockGameWindow("CANVAS IMAGE EXTRACTION BLOCKED");
+        return "data:,";
+      };
+      HTMLCanvasElement.prototype.toBlob = function(callback) {
+        blockGameWindow("CANVAS BLOB EXTRACTION BLOCKED");
+        if (typeof callback === "function") callback(null);
+      };
+    } catch (_) {}
+
+    return { blockGameWindow, unblockGameWindow };
+  }
+
   function bindEvents() {
+    setupSecurityProtection();
+
     // Switch to touch mode only on a genuine touch interaction.
     window.addEventListener("touchstart", () => setTouchMode(true), { passive: true });
     window.addEventListener("pointerdown", (e) => {
@@ -3745,6 +3943,10 @@
 
     window.addEventListener("resize", resize);
     window.addEventListener("keydown", (event) => {
+      if (state.securityLocked) {
+        event.preventDefault();
+        return;
+      }
       if (state.mode === "story") {
         state.save.controlsSeen = true;
         saveGame();

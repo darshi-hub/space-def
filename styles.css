@@ -1334,3 +1334,239 @@ kbd {
   #miniMap { width: 80px; height: 80px; bottom: 140px; }
   .warning { bottom: 138px; font-size: 6px; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   SECURITY LOCKDOWN & ANTI-DOWNLOAD / SAVE PROTECTION
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Prevent text selection and drag selection across the application */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Print protection: prevent browser Print / Save to PDF operations */
+@media print {
+  html, body, #gameCanvas, #hud, #commandDeck, #storyScreen, .screen, .modal {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Background blur & lock filter when the window is blocked */
+body.window-blocked #gameCanvas,
+body.window-blocked #commandDeck,
+body.window-blocked #hud,
+body.window-blocked #storyScreen,
+body.window-blocked .controls-overlay,
+body.window-blocked .mobile-controls {
+  filter: blur(14px) brightness(0.22) saturate(0.4);
+  pointer-events: none !important;
+  transition: filter 0.15s ease-out;
+}
+
+.security-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 5, 12, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.security-panel {
+  position: relative;
+  width: min(580px, 94vw);
+  background: linear-gradient(180deg, #18060a 0%, #0c0307 100%);
+  border: 2px solid var(--red);
+  box-shadow:
+    0 0 35px rgba(255, 92, 122, 0.4),
+    inset 0 0 25px rgba(255, 92, 122, 0.15);
+  padding: clamp(16px, 3vw, 24px);
+  margin: auto;
+}
+
+.security-hazard-stripes {
+  height: 6px;
+  width: 100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--red),
+    var(--red) 12px,
+    #2a040d 12px,
+    #2a040d 24px
+  );
+  margin-bottom: 14px;
+}
+
+.security-top-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--red);
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+.security-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red);
+  animation: sec-pulse 1s infinite alternate;
+}
+
+@keyframes sec-pulse {
+  from { opacity: 0.35; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1.2); }
+}
+
+.security-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 92, 122, 0.25);
+}
+
+.security-icon-glitch {
+  font-size: 34px;
+  line-height: 1;
+  text-shadow: 0 0 14px var(--red);
+  animation: sec-shake 2.5s infinite;
+}
+
+@keyframes sec-shake {
+  0%, 90%, 100% { transform: translate(0, 0); }
+  92% { transform: translate(-2px, 1px); }
+  94% { transform: translate(2px, -1px); }
+  96% { transform: translate(-1px, -2px); }
+}
+
+.security-headings {
+  min-width: 0;
+}
+
+.security-eyebrow {
+  color: var(--amber) !important;
+  margin-bottom: 5px !important;
+  font-size: 7.5px !important;
+}
+
+.security-title {
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(14px, 2.2vw, 20px) !important;
+  margin: 0 !important;
+  text-shadow: 0 0 14px rgba(255, 92, 122, 0.6);
+  letter-spacing: 0.5px;
+}
+
+.security-reason-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 92, 122, 0.1);
+  border: 1px solid var(--red);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.reason-indicator {
+  color: var(--red);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.security-reason-text {
+  margin: 0;
+  color: #ffb8c5;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7.5px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.security-warning-notice {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+
+.security-status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sec-grid-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 92, 122, 0.2);
+  padding: 8px 10px;
+  font-size: 10px;
+}
+
+.sec-label {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.sec-status {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+}
+
+.sec-status.alert-danger {
+  color: var(--red);
+  text-shadow: 0 0 6px var(--red);
+}
+
+.sec-status.alert-safe {
+  color: var(--cyan);
+  text-shadow: 0 0 6px var(--cyan);
+}
+
+.security-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.security-unlock-btn {
+  background: linear-gradient(135deg, var(--red), #ff8097) !important;
+  border: 2px solid #ff8097 !important;
+  color: #120206 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 16px rgba(255, 92, 122, 0.4) !important;
+}
+
+.security-unlock-btn:hover {
+  filter: brightness(1.15);
+}
+
+@media (max-width: 540px) {
+  .security-status-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
